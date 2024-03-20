@@ -1,0 +1,3 @@
+/Users/Joel/FYP/pico_fyp/build/pioasm/CMakeFiles/pioasm.dir
+/Users/Joel/FYP/pico_fyp/build/pioasm/CMakeFiles/edit_cache.dir
+/Users/Joel/FYP/pico_fyp/build/pioasm/CMakeFiles/rebuild_cache.dir
