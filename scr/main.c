@@ -24,6 +24,7 @@ bool repeating_timer_callback(struct repeating_timer *t) {
 }
 
 int main() {
+    
     // Initialize LED GPIO
     stdio_init_all();
     gpio_init(LED_PIN);
