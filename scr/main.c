@@ -7,6 +7,7 @@
 #include "stepper_control.h"
 #include "PWM.h"
 
+#define DEFAULT_MOTOR_RPM 5
 
 #define LED_PIN 15
 #define EN_PIN 14
@@ -15,10 +16,10 @@
 int led_value =0;
 
 bool repeating_timer_callback(struct repeating_timer *t) {
-    
+    led_value = 1 -led_value;
 
     cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, led_value);
-    //gpio_put(LED_PIN, led_value);
+    gpio_put(LED_PIN, led_value);
     return true;
 }
 
@@ -44,7 +45,7 @@ int main() {
     
 
     struct repeating_timer timer;
-    initStepperMotor(LED_PIN);
+    initStepperMotor(LED_PIN, DEFAULT_MOTOR_RPM);
     add_repeating_timer_ms(500, repeating_timer_callback, NULL, &timer);
 
 

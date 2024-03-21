@@ -4,11 +4,11 @@
 
 #include "PWM.h"
 
-uint32_t pwm_set_freq_duty(uint slice_num, uint chan, float freq, uint32_t duty) {
+uint32_t pwm_set_freq_duty(uint slice_num, uint chan, uint32_t freq, uint32_t duty) {
 
     uint32_t clock = 125000000;
     // Convert frequency from Hz to PWM-friendly format
-    uint32_t divider16 = clock / freq / 4096 + (clock % (uint32_t)(freq * 4096) != 0);
+    uint32_t divider16 = clock / freq / 4096 + (clock % (freq * 4096) != 0);
     if (divider16 /16 == 0) {
         divider16 = 16;
      }
@@ -23,7 +23,7 @@ uint32_t pwm_set_freq_duty(uint slice_num, uint chan, float freq, uint32_t duty)
 }
 
 
-void GPIO_PWM_Init(uint gpio_num, float pwm_freq, uint32_t pwm_duty) {
+void GPIO_PWM_Init(uint gpio_num, uint32_t pwm_freq, uint32_t pwm_duty) {
     
     //sets GPIO function as PWM
     gpio_set_function(gpio_num, GPIO_FUNC_PWM); // enum GPIO_FUNC_PWM = 4
