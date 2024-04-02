@@ -8,7 +8,7 @@
 #include "PWM.h"
 
 #define DEFAULT_FREQ 1
-#define DEFAULT_DUTY 50
+#define DEFAULT_DUTY 85
 #define SPR 200
 
 // const float DEFAULT_FREQ = 0.5;
