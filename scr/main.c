@@ -9,7 +9,7 @@
 #define DEFAULT_MOTOR_RPM 5
 
 #define LED_PIN 11
-#define EN_PIN 14
+#define EN_PIN 15
 #define DIR_PIN 10
 #define NSLEEP 12
 int led_value =0;
