@@ -1,5 +1,6 @@
 # pico_fyp
 
+Make sure to create an enviroment variable called PICO_SDK_PATH which is a relitive path to wherever your pico-sdk folder is stored
 
 
 ## Getting started
