@@ -25,7 +25,7 @@ add_executable(main
 )
 
 # Link the required libraries
-target_link_libraries(main PRIVATE pico_stdlib pico_cyw43_arch_none hardware_pwm )
+target_link_libraries(main PRIVATE pico_stdlib hardware_pwm )
 
 # Add include directories
 target_include_directories(main PRIVATE ${PICO_SDK_PATH})

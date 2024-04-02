@@ -40,7 +40,6 @@ int main() {
 
     // Initialize LED GPIO
     stdio_init_all();
-    cyw43_arch_init();
 
     gpio_init(STEP_PIN);
     gpio_init(EN_PIN);
