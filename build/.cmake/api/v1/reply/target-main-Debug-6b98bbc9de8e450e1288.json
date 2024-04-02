@@ -2,7 +2,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "main.elf"
+			"path" : "======main.elf"
 		}
 	],
 	"backtrace" : 1,
@@ -15,7 +15,8 @@
 			"pico_define_boot_stage2",
 			"add_dependencies",
 			"target_compile_definitions",
-			"pico_add_extra_outputs"
+			"pico_add_extra_outputs",
+			"target_include_directories"
 		],
 		"files" : 
 		[
@@ -31,13 +32,13 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 11,
+				"line" : 21,
 				"parent" : 0
 			},
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 20,
+				"line" : 28,
 				"parent" : 0
 			},
 			{
@@ -64,7 +65,7 @@
 			{
 				"command" : 5,
 				"file" : 0,
-				"line" : 24,
+				"line" : 35,
 				"parent" : 0
 			},
 			{
@@ -72,6 +73,12 @@
 				"file" : 2,
 				"line" : 30,
 				"parent" : 7
+			},
+			{
+				"command" : 6,
+				"file" : 0,
+				"line" : 31,
+				"parent" : 0
 			}
 		]
 	},
@@ -272,6 +279,10 @@
 			],
 			"includes" : 
 			[
+				{
+					"backtrace" : 9,
+					"path" : "C:/Program Files/Raspberry Pi/Pico SDK v1.5.1/pico-sdk"
+				},
 				{
 					"backtrace" : 2,
 					"path" : "C:/Program Files/Raspberry Pi/Pico SDK v1.5.1/pico-sdk/src/common/pico_stdlib/include"
@@ -728,6 +739,10 @@
 			"includes" : 
 			[
 				{
+					"backtrace" : 9,
+					"path" : "C:/Program Files/Raspberry Pi/Pico SDK v1.5.1/pico-sdk"
+				},
+				{
 					"backtrace" : 2,
 					"path" : "C:/Program Files/Raspberry Pi/Pico SDK v1.5.1/pico-sdk/src/common/pico_stdlib/include"
 				},
@@ -1143,6 +1158,10 @@
 			],
 			"includes" : 
 			[
+				{
+					"backtrace" : 9,
+					"path" : "C:/Program Files/Raspberry Pi/Pico SDK v1.5.1/pico-sdk"
+				},
 				{
 					"backtrace" : 2,
 					"path" : "C:/Program Files/Raspberry Pi/Pico SDK v1.5.1/pico-sdk/src/common/pico_stdlib/include"
@@ -2183,6 +2202,11 @@
 				"role" : "flags"
 			},
 			{
+				"backtrace" : 2,
+				"fragment" : "-lpico_cyw43_arch_none",
+				"role" : "libraries"
+			},
+			{
 				"backtrace" : 5,
 				"fragment" : "pico-sdk\\src\\rp2_common\\boot_stage2\\bs2_default_padded_checksummed.S",
 				"role" : "libraries"
@@ -2191,7 +2215,7 @@
 		"language" : "CXX"
 	},
 	"name" : "main",
-	"nameOnDisk" : "main.elf",
+	"nameOnDisk" : "======main.elf",
 	"paths" : 
 	{
 		"build" : ".",
