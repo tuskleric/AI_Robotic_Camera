@@ -1,4 +1,4 @@
-// Padded and checksummed version of: /Users/Joel/FYP/pico_fyp/build/pico-sdk/src/rp2_common/boot_stage2/bs2_default.bin
+// Padded and checksummed version of: C:/Users/jorda/Dropbox/Jordan/Education Jordan/UC/2024/ENME408/AI_Robotic_Camera/build/pico-sdk/src/rp2_common/boot_stage2/bs2_default.bin
 
 .cpu cortex-m0plus
 .thumb

@@ -17,7 +17,7 @@ add_executable(main
 
 
 # target_include_directories(main PRIVATE User/Joel/Pico/pico-sdk/src/common/)
-target_link_libraries(main PRIVATE pico_stdlib pico_cyw43_arch_none hardware_pwm) 
+target_link_libraries(main PRIVATE pico_stdlib hardware_pwm) 
 
 
 pico_enable_stdio_usb(main 1)

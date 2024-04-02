@@ -1,7 +1,6 @@
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 #include "hardware/timer.h"
-#include "pico/cyw43_arch.h"
 #include "hardware/pwm.h"
 
 #include "stepper_control.h"
@@ -9,16 +8,15 @@
 
 #define DEFAULT_MOTOR_RPM 5
 
-#define LED_PIN 15
+#define LED_PIN 11
 #define EN_PIN 14
-#define DIR_PIN 13
+#define DIR_PIN 10
 #define NSLEEP 12
 int led_value =0;
 
 bool repeating_timer_callback(struct repeating_timer *t) {
     led_value = 1 -led_value;
 
-    cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, led_value);
     gpio_put(LED_PIN, led_value);
     return true;
 }
