@@ -80,7 +80,7 @@ int main() {
     
 
  
-    initStepperMotorPWM(STEP_PIN, DEFAULT_MOTOR_RPM*STEPPING_MODE);
+    //initStepperMotorPWM(STEP_PIN, DEFAULT_MOTOR_RPM*STEPPING_MODE);
     // Set up interrupt handler for the button press
     //gpio_set_irq_enabled(SLEEP_PIN, GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE, true);
     //gpio_set_irq_enabled_with_callback(SLEEP_PIN, GPIO_IRQ_EDGE_FALL, true, &sleep_ISR);
@@ -89,17 +89,17 @@ int main() {
 
     while(1) {
 
-        // if (on_state & !gpio_get(SLEEP_PIN)) {
-        //     gpio_put(EN_PIN, 0);
-        //     gpio_put(25, 0);
-        //     on_state = false;
-        // } else if (!on_state & gpio_get(SLEEP_PIN)) {
-        //     gpio_put(EN_PIN, 1);
-        //     gpio_put(25, 1);
-        //     on_state = true;
-        // }
-        // rotateStepperMotor(STEP_PIN, STEPPING_MODE*STEPS_PER_REV*GEAR_RATIO/10);
-        sleep_ms(1000);
+        if (on_state & gpio_get(SLEEP_PIN)) {
+            gpio_put(EN_PIN, 0);
+            gpio_put(25, 0);
+            on_state = false;
+        } else if (!on_state & !gpio_get(SLEEP_PIN)) {
+            gpio_put(EN_PIN, 1);
+            gpio_put(25, 1);
+            on_state = true;
+        }
+        rotateStepperMotor(STEP_PIN, STEPPING_MODE*STEPS_PER_REV*GEAR_RATIO/10);
+        sleep_ms(10000);
 
         // if (gpio_get(SLEEP_PIN) == 0) {
         //     sleep_ms(100000);
