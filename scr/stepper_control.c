@@ -1,6 +1,7 @@
 
 #include <stdlib.h>
 
+#include "pico/stdlib.h"
 #include "hardware/gpio.h"
 #include "hardware/pwm.h"
 
@@ -13,23 +14,26 @@
 
 // const float DEFAULT_FREQ = 0.5;
 
-uint32_t RPM_to_Freqency(uint16_t motor_RPM) {
+static uint32_t RPM_to_Freqency(uint16_t motor_RPM) {
     uint32_t freq = (motor_RPM * SPR) / 60;
 
     return freq;
 
 }
-void initStepperMotor(uint step_gpio_num, uint motor_RPM) {
+void initStepperMotorPWM(uint step_gpio_num, uint motor_RPM) {
     
     uint32_t motor_freq = RPM_to_Freqency(motor_RPM);
 
     GPIO_PWM_Init(step_gpio_num, motor_freq, DEFAULT_DUTY);
 
-    
-
-
-
-
+}
+void rotateStepperMotor(uint step_gpio_num, uint num_ticks) {
+    for (uint i = 0; i < num_ticks; i++) {
+        gpio_put(step_gpio_num, 1);
+        sleep_us(500);
+        gpio_put(step_gpio_num, 0);
+        sleep_us(500);
+    }
 }
 
 // void step(bool Direction){

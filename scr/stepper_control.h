@@ -15,9 +15,10 @@ Date Created: 18/03/2024
 #include "stdint.h"
 
 
-uint32_t RPM_to_Freqency(uint16_t motor_RPM);
+static uint32_t RPM_to_Freqency(uint16_t motor_RPM);
 
-void initStepperMotor(uint step_gpio_num, uint motor_RPM);
+void initStepperMotorPWM(uint step_gpio_num, uint motor_RPM);
+void rotateStepperMotor(uint step_gpio_num, uint num_ticks);
 // void step(bool Direction);
 // void rotate(int Steps, bool Direction);
 

@@ -5,19 +5,19 @@
 110	233	7337199535860349	pico-sdk/src/rp2_common/boot_stage2/bs2_default.elf	c83020674f1d5191
 35	115	7337231042550542	CMakeFiles/main.dir/C_/Program_Files/Raspberry_Pi/Pico_SDK_v1.5.1/pico-sdk/src/rp2_common/pico_int64_ops/pico_int64_ops_aeabi.S.obj	131ff8f2bebf48a7
 525	791	7337230784577756	CMakeFiles/main.dir/C_/Program_Files/Raspberry_Pi/Pico_SDK_v1.5.1/pico-sdk/src/rp2_common/hardware_watchdog/watchdog.c.obj	99bfcf7401a2e5ab
-121	142	7337230778111086	pico-sdk/src/rp2_common/boot_stage2/bs2_default.bin	f59a2d63177179c4
 213	389	7337230780339674	CMakeFiles/main.dir/C_/Program_Files/Raspberry_Pi/Pico_SDK_v1.5.1/pico-sdk/src/rp2_common/pico_platform/platform.c.obj	a145895f34cb4f77
-142	195	7337230778609922	pico-sdk/src/rp2_common/boot_stage2/bs2_default_padded_checksummed.S	e6b7a2413f0e483b
+121	142	7337230778111086	pico-sdk/src/rp2_common/boot_stage2/bs2_default.bin	f59a2d63177179c4
 287	641	7337231047773738	CMakeFiles/main.dir/C_/Program_Files/Raspberry_Pi/Pico_SDK_v1.5.1/pico-sdk/lib/tinyusb/src/class/cdc/cdc_device.c.obj	81c4a632f557baa
+142	195	7337230778609922	pico-sdk/src/rp2_common/boot_stage2/bs2_default_padded_checksummed.S	e6b7a2413f0e483b
 142	195	7337230778609922	C:/Users/jorda/Dropbox/Jordan/Education Jordan/UC/2024/ENME408/AI_Robotic_Camera/build/pico-sdk/src/rp2_common/boot_stage2/bs2_default_padded_checksummed.S	e6b7a2413f0e483b
 545	755	7337230783226166	CMakeFiles/main.dir/C_/Program_Files/Raspberry_Pi/Pico_SDK_v1.5.1/pico-sdk/src/rp2_common/hardware_divider/divider.S.obj	71b409aec8268340
 230	375	7337230780309590	CMakeFiles/main.dir/C_/Program_Files/Raspberry_Pi/Pico_SDK_v1.5.1/pico-sdk/src/rp2_common/hardware_irq/irq_handler_chain.S.obj	5cfe16eb6daf7d32
-195	616	7337230782025342	CMakeFiles/main.dir/scr/main.c.obj	c7fbcac0b3ce16ab
+36	262	7357967110729244	CMakeFiles/main.dir/scr/main.c.obj	c7fbcac0b3ce16ab
 202	581	7337230782075508	CMakeFiles/main.dir/scr/PWM.c.obj	947d377f578efa54
 18	175	7337231043145119	CMakeFiles/main.dir/C_/Program_Files/Raspberry_Pi/Pico_SDK_v1.5.1/pico-sdk/src/rp2_common/hardware_claim/claim.c.obj	6d868bead1d9d33b
 272	626	7337230782329804	CMakeFiles/main.dir/C_/Program_Files/Raspberry_Pi/Pico_SDK_v1.5.1/pico-sdk/src/common/pico_util/datetime.c.obj	926b5b803c2d40ff
 389	622	7337231046880987	CMakeFiles/main.dir/C_/Program_Files/Raspberry_Pi/Pico_SDK_v1.5.1/pico-sdk/lib/tinyusb/src/class/dfu/dfu_device.c.obj	dd9e6a00245d9797
-199	452	7337230781044078	CMakeFiles/main.dir/scr/stepper_control.c.obj	d810433251b17ee5
+35	224	7357941734887198	CMakeFiles/main.dir/scr/stepper_control.c.obj	d810433251b17ee5
 238	438	7337230781034045	CMakeFiles/main.dir/C_/Program_Files/Raspberry_Pi/Pico_SDK_v1.5.1/pico-sdk/src/common/pico_sync/lock_core.c.obj	a14f329ab14260f4
 66	187	7337231043175201	CMakeFiles/main.dir/C_/Program_Files/Raspberry_Pi/Pico_SDK_v1.5.1/pico-sdk/src/rp2_common/pico_standard_link/crt0.S.obj	788d075272220042
 253	756	7337230783331858	CMakeFiles/main.dir/C_/Program_Files/Raspberry_Pi/Pico_SDK_v1.5.1/pico-sdk/src/common/pico_time/time.c.obj	5c34edc6cacf5a17
@@ -79,7 +79,8 @@
 630	792	7337231049318660	CMakeFiles/main.dir/ae783cfadb10a0055c655bcf0b179659/pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c.obj	365261c6aa5b94b7
 617	833	7337231049750513	CMakeFiles/main.dir/C_/Program_Files/Raspberry_Pi/Pico_SDK_v1.5.1/pico-sdk/lib/tinyusb/src/tusb.c.obj	bed0eaee930f7a90
 105	347	7337217400424806	main.elf	81fab7e3b34beca5
-6	823	7337233617172390	build.ninja	ea4d3c11f83eede5
+6	823	7357970417654622	build.ninja	ea4d3c11f83eede5
 17	121	7337230777424403	pico-sdk/src/rp2_common/boot_stage2/======bs2_default.elf	e3fc377606d81ae2
-16	106	7337234124779890	CMakeFiles/main.dir/scr/main.c.obj	c7fbcac0b3ce16ab
-107	351	7337234126157010	======main.elf	7c75205b279c61ae
+263	728	7357967113722947	======main.elf	7c75205b279c61ae
+36	226	7357970465043627	CMakeFiles/main.dir/scr/main.c.obj	c7fbcac0b3ce16ab
+228	698	7357970468111486	======main.elf	7c75205b279c61ae
