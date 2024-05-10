@@ -1,20 +1,19 @@
 cmake_minimum_required(VERSION 3.13)
 
-include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
-
-# include($ENV{PICO_EXTRAS_PATH}/external/pico_extras_import.cmake)
-
-project(pico_fyp C CXX ASM)
+include(pico_sdk_import.cmake)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
+project(pico_fyp C CXX ASM)
+
+
 pico_sdk_init()
 
-# # Set the binary directory for pico_sleep library build
-# set(PICO_SLEEP_BINARY_DIR ${CMAKE_BINARY_DIR}/pico_sleep_build)
+# # # Set the binary directory for pico_sleep library build
+#  set(PICO_SLEEP_BINARY_DIR ${CMAKE_BINARY_DIR}/pico_sleep_build)
 
-# # Add pico_sleep subdirectory
+# # # Add pico_sleep subdirectory
 # add_subdirectory(${PICO_EXTRAS_PATH}/src/rp2_common/pico_sleep ${PICO_SLEEP_BINARY_DIR})
 
 # Add your executable
