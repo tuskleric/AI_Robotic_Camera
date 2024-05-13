@@ -1,0 +1,6 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "L6981")(type "KiCad")(uri "C:/Users/sudda/OneDrive - University of Canterbury/Fourth year/FYP/components_models/L6981/2024-05-03_02-52-44.kicad_sym")(options "")(descr ""))
+  (lib (name "PI_pico")(type "KiCad")(uri "${KIPRJMOD}/components_models/SC0915/KiCADv6/2024-05-10_05-17-11.kicad_sym")(options "")(descr ""))
+  (lib (name "TMC2209")(type "KiCad")(uri "C:/Users/sudda/OneDrive - University of Canterbury/Fourth year/FYP/components_models/TMC2209_BOB/TMC2209.kicad_sym")(options "")(descr ""))
+)

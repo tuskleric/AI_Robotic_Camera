@@ -1,0 +1,5 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "TMC2209_SILENTSTEPSTICK")(type "KiCad")(uri "C:/Users/sudda/OneDrive - University of Canterbury/Fourth year/FYP/components_models/TMC2209_BOB/TMC2209_SILENTSTEPSTICK")(options "")(descr ""))
+  (lib (name "MCU_RaspberryPi_and_Boards")(type "KiCad")(uri "C:/Users/sudda/OneDrive - University of Canterbury/Fourth year/FYP/components_models/RpiPICO/MCU_RaspberryPi_and_Boards.pretty")(options "")(descr ""))
+)
