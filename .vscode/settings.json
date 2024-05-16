@@ -27,6 +27,10 @@
     "timer.h": "c",
     "pwm.h": "c",
     "stepper_control.h": "c",
-    "gpio.h": "c"
+    "gpio.h": "c",
+    "i2c.h": "c",
+    "stdlib.h": "c",
+    "binary_info.h": "c",
+    "i2c_fifo.h": "c"
   }
 }

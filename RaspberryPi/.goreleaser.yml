@@ -1,0 +1,35 @@
+project_name: tester
+
+release:
+  github:
+    owner: TheCacophonyProject
+    name: tc2-hat-controller
+  name_template: '{{.Tag}}'
+
+builds:
+- id: test
+  binary: testfoo
+  main: ./test.go
+  goos:
+    - linux
+  goarch:
+    - arm
+  goarm:
+    - "7"
+  ldflags: -s -w -X main.version={{.Version}}
+
+nfpms:
+- vendor: The Cacophony Project
+  homepage: http://cacophony.org.nz/
+  maintainer: Cacophony Developers <coredev@cacophony.org.nz>
+  description: Controls the ATtiny and other device on the Pi HAT
+  license: GPL v3.0
+  file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Arch }}"
+  formats:
+    - deb
+  bindir: /usr/bin
+  
+checksum:
+  name_template: '{{ .ProjectName }}_{{ .Version }}_checksums.txt'
+
+dist: dist
