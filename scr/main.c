@@ -117,6 +117,7 @@ int main() {
     const uint LED_PIN = PICO_DEFAULT_LED_PIN;
     gpio_init(LED_PIN);
     gpio_set_dir(LED_PIN, GPIO_OUT);
+<<<<<<< HEAD
 
     // Enable the I2C interrupts we want to process
     i2c0->hw->intr_mask = (I2C_IC_INTR_MASK_M_RD_REQ_BITS | I2C_IC_INTR_MASK_M_RX_FULL_BITS);
@@ -151,6 +152,10 @@ int main() {
         // }
 
 =======
+=======
+
+    while(1) {
+>>>>>>> ac3ee8649d117a6b43e4a4fa46adc1c2819c7f7b
         gpio_put(LED_PIN, 1);
         sleep_ms(250);
         gpio_put(LED_PIN, 0);
