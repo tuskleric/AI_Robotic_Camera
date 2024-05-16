@@ -1,6 +1,2 @@
-/CmakeFiles
-.bin
-.dis
-.elf
-.map
-.hex
+.DS_Store
+build/
