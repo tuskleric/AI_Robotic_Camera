@@ -13,8 +13,10 @@ Date Created: 18/03/2024
 
 // #includes
 #include "stdint.h"
+#include "common.h"
 
-
+// Function prototypes
+void initialize_motors(void);
 static uint32_t RPM_to_Freqency(uint16_t motor_RPM);
 
 void initStepperMotorPWM(uint step_gpio_num, uint motor_RPM);
