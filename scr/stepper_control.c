@@ -30,9 +30,9 @@ void initStepperMotorPWM(uint step_gpio_num, uint motor_RPM) {
 void rotateStepperMotor(uint step_gpio_num, uint num_ticks) {
     for (uint i = 0; i < num_ticks; i++) {
         gpio_put(step_gpio_num, 1);
-        sleep_us(500);
+        sleep_us(50);
         gpio_put(step_gpio_num, 0);
-        sleep_us(500);
+        sleep_us(50);
     }
 }
 

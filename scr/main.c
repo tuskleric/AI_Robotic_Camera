@@ -13,7 +13,7 @@
 #define DEFAULT_MOTOR_RPM 1
 #define STEPS_PER_REV 200
 #define STEPPING_MODE 32
-#define GEAR_RATIO 3.2
+#define GEAR_RATIO 30
 
 #define DIR_PIN    10
 #define STEP_PIN   11
@@ -21,6 +21,9 @@
 #define NRST       13
 #define EN_PIN     15
 #define SLEEP_PIN  17 //any GPIO pin
+#define ENCODERA   20
+#define ENCODERB   19
+#define LED_PIN    PICO_DEFAULT_LED_PIN
 
 // Define constants for 12-hour cycle
 #define TWELVE_HOURS_IN_SECONDS 43200
@@ -48,19 +51,35 @@ void awake_ISR() {
     // sleep_goto_dormant_until_edge_high(17);
 }
 
-uint8_t tester = 0;
+int position = 0;
+
+void encoder_callback(uint gpio, uint32_t event) {
+    switch (event)
+    {
+        case GPIO_IRQ_EDGE_FALL:
+            position += (ENCODERA == gpio)*((gpio_get(ENCODERB)) ? -1 : 1) + (ENCODERB == gpio)*((gpio_get(ENCODERA)) ? 1 : -1);
+            break;
+        case GPIO_IRQ_EDGE_RISE:
+            position += (ENCODERA == gpio)*((gpio_get(ENCODERB)) ? 1 : -1) + (ENCODERB == gpio)*((gpio_get(ENCODERA)) ? -1 : 1);
+            break;
+    }
+
+}
+
+uint8_t tester[2];
 
 void I2CIRQHandler() {
 
     uint32_t intr_stat = i2c0->hw->intr_stat;
+    i2c_read_blocking (i2c_default, 0x15, &tester, 2, true);
+    
+    // if (intr_stat & I2C_IC_INTR_STAT_R_RX_FULL_BITS) {
+    //     i2c_read_blocking (i2c_default, 0x15, &tester, 1, true);
+    // }
 
-    if (intr_stat & I2C_IC_INTR_STAT_R_RX_FULL_BITS) {
-        i2c_read_blocking (i2c_default, 0x15, &tester, 1, true);
-    }
-
-    if (intr_stat & I2C_IC_INTR_STAT_R_TX_ABRT_BITS) {
-        i2c_write_blocking (i2c_default, 0x15, &tester, 1, true);
-    }
+    // if (intr_stat & I2C_IC_INTR_STAT_R_TX_ABRT_BITS) {
+    //     i2c_write_blocking (i2c_default, 0x15, &tester, 1, true);
+    // }
 }
 
 
@@ -85,7 +104,9 @@ int main() {
     gpio_init(DIR_PIN);
     gpio_init(NSLEEP);
     gpio_init(SLEEP_PIN);
-    gpio_init(25);
+    gpio_init(ENCODERA);
+    gpio_init(ENCODERB);
+    
 
     gpio_set_dir(STEP_PIN, GPIO_OUT);
     gpio_set_dir(EN_PIN, GPIO_OUT);
@@ -93,7 +114,8 @@ int main() {
     gpio_set_dir(DIR_PIN, GPIO_OUT);
     gpio_set_dir(NSLEEP, GPIO_OUT);
     gpio_set_dir(SLEEP_PIN, GPIO_IN);
-    gpio_set_dir(25, GPIO_OUT);
+    gpio_set_dir(ENCODERA, GPIO_IN);
+    gpio_set_dir(ENCODERB, GPIO_IN);
 
 
     gpio_put(DIR_PIN, 1);
@@ -110,14 +132,14 @@ int main() {
  
     //initStepperMotorPWM(STEP_PIN, DEFAULT_MOTOR_RPM*STEPPING_MODE);
     // Set up interrupt handler for the button press
-    //gpio_set_irq_enabled(SLEEP_PIN, GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE, true);
-    //gpio_set_irq_enabled_with_callback(SLEEP_PIN, GPIO_IRQ_EDGE_FALL, true, &sleep_ISR);
-    //gpio_set_irq_enabled_with_callback(SLEEP_PIN, GPIO_IRQ_EDGE_RISE, true, &awake_ISR);
     bool on_state = true;
-    const uint LED_PIN = PICO_DEFAULT_LED_PIN;
     gpio_init(LED_PIN);
     gpio_set_dir(LED_PIN, GPIO_OUT);
-<<<<<<< HEAD
+
+    gpio_set_irq_enabled_with_callback(ENCODERA, GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE, true, encoder_callback);
+
+    gpio_set_irq_enabled_with_callback(ENCODERB, GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE, true, encoder_callback);
+    
 
     // Enable the I2C interrupts we want to process
     i2c0->hw->intr_mask = (I2C_IC_INTR_MASK_M_RD_REQ_BITS | I2C_IC_INTR_MASK_M_RX_FULL_BITS);
@@ -129,9 +151,13 @@ int main() {
     irq_set_enabled(I2C0_IRQ, true);
 
     while(1) {
-<<<<<<< HEAD
 
-        printf("%d", tester);
+        printf("%d %d\n", tester, position);
+        uint16_t dist = 0;
+        dist = (tester[1] << 8) | tester[0];
+        rotateStepperMotor(STEP_PIN, STEPPING_MODE*STEPS_PER_REV*dist/360);
+        tester[0] = 0;
+        tester[1] = 0;
         sleep_ms(500);
 
         // if (!on_state & gpio_get(SLEEP_PIN)) {
@@ -150,28 +176,6 @@ int main() {
         //     gpio_put(EN_PIN, 1);
         //     sleep_ms(10000);
         // }
-
-=======
-=======
-
-    while(1) {
->>>>>>> ac3ee8649d117a6b43e4a4fa46adc1c2819c7f7b
-        gpio_put(LED_PIN, 1);
-        sleep_ms(250);
-        gpio_put(LED_PIN, 0);
-        sleep_ms(250);
-        if (on_state & gpio_get(SLEEP_PIN)) {
-            gpio_put(EN_PIN, 0);
-            gpio_put(25, 0);
-            on_state = false;
-        } else if (!on_state & !gpio_get(SLEEP_PIN)) {
-            gpio_put(EN_PIN, 1);
-            gpio_put(25, 1);
-            on_state = true;
-        }
-        rotateStepperMotor(STEP_PIN, STEPPING_MODE*STEPS_PER_REV*GEAR_RATIO/10);
-        sleep_ms(10000);
->>>>>>> ac3ee8649d117a6b43e4a4fa46adc1c2819c7f7b
 
         // if (gpio_get(SLEEP_PIN) == 0) {
         //     sleep_ms(100000);
