@@ -1,3 +1,4 @@
+
 cmake_minimum_required(VERSION 3.13)
 
 include(pico_sdk_import.cmake)
@@ -24,10 +25,13 @@ add_executable(main
   scr/battery_monitor.c
   scr/tmc2209.c
   scr/common.c
+  scr/scheduler.c
+  scr/tick.c
 )
 
+
 # Link the required libraries
-target_link_libraries(main PRIVATE pico_stdlib hardware_pwm hardware_adc hardware_uart)
+target_link_libraries(main PRIVATE pico_stdlib hardware_pwm hardware_adc hardware_uart pico_time)
 
 # Add include directories
 target_include_directories(main PRIVATE ${PICO_SDK_PATH})
