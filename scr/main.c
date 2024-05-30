@@ -12,8 +12,6 @@
 #include "battery_monitor.h"
 #include "tmc2209.h"
 #include "common.h"
-#include "tick.h"
-#include "scheduler.h"
 
 
 #define ADC_TEMP_CH 4
@@ -38,9 +36,6 @@
 #define UART_INSTANCE  uart1
 #define UART_PARITY_NONE 0
 
-const uint LED_PIN = PICO_DEFAULT_LED_PIN;
-
-
 
 /*
  * Maximum value for the ADC clock divider. Results in about 7.6 Hz, or
@@ -58,19 +53,6 @@ static void adc_isr(void)
 
 }
 
-void systick_callback() {
-    //interrupt_Handler here.
-}
-
-
-systick_handler_t led_timer;
-
-void toggle_led(void)
-{
-    printf("getting to here");
-    gpio_put(LED_PIN, !gpio_get(LED_PIN));
-
-}
 
 void sleep_for(uint32_t duration_seconds) {
     // Convert duration to milliseconds and call sleep_ms()
@@ -121,12 +103,10 @@ void encoder_callback(uint gpio, uint32_t event) {
     }
 
 }
-    scheduler kernal; 
-    
-    
+
 int main() {
     stdio_init_all();
-
+    
     // Initialise UART 0
     // Initialize the UART with a baud rate (e.g., 9600)
     uart_init(UART_INSTANCE, 9600);
@@ -144,10 +124,10 @@ int main() {
     const trinamic_cfg_params_t *default_params = TMC2209_GetConfigDefaults();
 
     // Initialize the driver instance with default values
-    //TMC2209_SetDefaults(&driver_instance);
+    TMC2209_SetDefaults(&driver_instance);
 
     // Initialize the driver
-    //bool init_success = TMC2209_Init(&driver_instance);
+    bool init_success = TMC2209_Init(&driver_instance);
         // Set the desired VACTUAL value
     //uint32_t newVACTUAL = 11930; // Set to your desired value
 
@@ -172,7 +152,6 @@ int main() {
     gpio_init(25);
     gpio_init(ENCODER_A);
     gpio_init(ENCODER_B);
-    gpio_init(LED_PIN);
     gpio_set_dir(STEP_PIN, GPIO_OUT);
     gpio_set_dir(EN_PIN, GPIO_OUT);
     gpio_set_dir(NRST, GPIO_OUT);
@@ -182,7 +161,7 @@ int main() {
     gpio_set_dir(25, GPIO_OUT);
     gpio_set_dir(ENCODER_A, GPIO_IN);
     gpio_set_dir(ENCODER_B, GPIO_IN);
-    gpio_set_dir(LED_PIN, GPIO_OUT);
+
     gpio_put(DIR_PIN, 1);
     gpio_put(STEP_PIN, 0);
     gpio_put(EN_PIN, 0);
@@ -227,39 +206,21 @@ int main() {
     //gpio_set_irq_enabled_with_callback(SLEEP_PIN, GPIO_IRQ_EDGE_FALL, true, &sleep_ISR);
     //gpio_set_irq_enabled_with_callback(SLEEP_PIN, GPIO_IRQ_EDGE_RISE, true, &awake_ISR);
     bool on_state = true;
-
-    // init_non_blocking_timer(&led_timer, 1000, CONTINOUS_MODE);
-    // init_systick();
-
-    // start_non_blocking_timer(&led_timer);
-
-    kernal.tickPeriod = 10000;
-    
-    kernal_init();
-
-    struct repeating_timer timer;
-    add_repeating_timer_us(kernal.tickPeriod, alarm_callback, NULL, &timer);
-    taskId_t task1_id = register_task(toggle_led, 1, 200000); // Task 1 with priority 1 and period 200000 us (200 ms)
+    const uint LED_PIN = PICO_DEFAULT_LED_PIN;
+    gpio_init(LED_PIN);
+    gpio_set_dir(LED_PIN, GPIO_OUT);
 
     while(1) {
-    //     if (task1_id.Id == 0 && task1_id.Id < MAX_TASKS) {
-    //     printf("kernal_task period confirm %lld us\n", kernal.tasks[0].period);
-    // } else {
-    //     printf("Failed to register task\n");
-    // }
-        kernal_start();
-        // if (non_blocking_timer_expired(&led_timer) == TIMER_EXPIRED) 
-        // {
-        //     toggle_led();
-        // }
-        // //printf("current: %d\n", TMC2209_GetCurrent (&driver_instance));
-        // // 12-bit conversion, assume max value == ADC_VREF == 3.3 V
+\
+        
+        printf("current: %d\n", TMC2209_GetCurrent (&driver_instance));
+        // 12-bit conversion, assume max value == ADC_VREF == 3.3 V
          
-        // // uint16_t result = adc_read();
-        // if (adc_avail) {
-        //     printf("voltage: %f \n", voltage );
-        //     adc_avail=0;
-        // };
+        // uint16_t result = adc_read();
+        if (adc_avail) {
+            //printf("voltage: %f \n", voltage );
+            adc_avail=0;
+        };
         // sleep_ms(500);
         // gpio_put(LED_PIN, 1);
         // sleep_ms(250);
@@ -275,7 +236,7 @@ int main() {
         //     on_state = true;
         // }
         
-        //rotateStepperMotor(STEP_PIN, 51200);//STEPPING_MODE*STEPS_PER_REV*GEAR_RATIO/10);
+        rotateStepperMotor(STEP_PIN, 51200);//STEPPING_MODE*STEPS_PER_REV*GEAR_RATIO/10);
         //sleep_ms(10000);
 
         // if (gpio_get(SLEEP_PIN) == 0) {

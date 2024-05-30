@@ -27,7 +27,6 @@
     "timer.h": "c",
     "pwm.h": "c",
     "stepper_control.h": "c",
-    "gpio.h": "c",
-    "uart.h": "c"
+    "gpio.h": "c"
   }
 }
