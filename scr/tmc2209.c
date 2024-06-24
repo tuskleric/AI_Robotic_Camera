@@ -45,9 +45,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <stdio.h>
 #include "pico/stdlib.h"
-
+#include "hardware/gpio.h"
 #include "tmc2209.h"
 
+#define LED_PIN 25
 static const trinamic_cfg_params_t cfg_params = {
 
     .cap.drvconf = 0,
@@ -168,12 +169,14 @@ void TMC2209_SetDefaults (TMC2209_t *driver)
 
 bool TMC2209_Init (TMC2209_t *driver)
 {
-
+    
     // Perform a status register read/write to clear status flags.
     // If no or bad response from driver return with error.
+    TMC2209_ReadRegister(driver, (TMC2209_datagram_t *)&driver->ioin);
+    
     if(!TMC2209_ReadRegister(driver, (TMC2209_datagram_t *)&driver->gstat))
         return false;
-
+    
 
     TMC2209_WriteRegister(driver, (TMC2209_datagram_t *)&driver->gstat);
 
@@ -340,9 +343,10 @@ bool TMC2209_ReadRegister (TMC2209_t *driver, TMC2209_datagram_t *reg)
     datagram.msg.addr.value = reg->addr.value;
     datagram.msg.addr.write = 0;
     calcCRC(datagram.data, sizeof(TMC_uart_read_datagram_t));
-
+    //while (1) {printf("slv adress = %d\n", datagram.msg.slave);}
     res = tmc_uart_read(driver->config.motor, &datagram);
-
+    
+   
     if(res->msg.slave == 0xFF && res->msg.addr.value == datagram.msg.addr.value) {
         uint8_t crc = res->msg.crc;
         calcCRC(res->data, sizeof(TMC_uart_write_datagram_t));
@@ -351,7 +355,7 @@ bool TMC2209_ReadRegister (TMC2209_t *driver, TMC2209_datagram_t *reg)
             byteswap(reg->payload.data);
         }
     }
-
+    //while (1) {printf("res = %d\n", res->msg.addr.value);}
     return ok;
 }
 

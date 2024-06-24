@@ -22,16 +22,21 @@ add_executable(main
   scr/stepper_control.c
   scr/PWM.c
   scr/battery_monitor.c
+  scr/scheduler.c
+  scr/tick.c
   scr/tmc2209.c
   scr/common.c
+  scr/blink.c
+
 )
 
 # Link the required libraries
-target_link_libraries(main PRIVATE pico_stdlib hardware_pwm hardware_adc hardware_uart)
+target_link_libraries(main PRIVATE pico_stdlib pico_time hardware_pwm hardware_adc hardware_uart  )
 
 # Add include directories
 target_include_directories(main PRIVATE ${PICO_SDK_PATH})
 
 
 pico_enable_stdio_usb(main 1)
+
 pico_add_extra_outputs(main)

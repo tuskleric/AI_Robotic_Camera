@@ -1,17 +1,21 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
+#include "pico/time.h"
 #include "hardware/gpio.h"
 #include "hardware/timer.h"
 #include "hardware/pwm.h"
 #include "hardware/adc.h"
 #include "hardware/uart.h"
 
-
+#include "scheduler.h"
+#include "tick.h"
 #include "stepper_control.h"
 #include "PWM.h"
 #include "battery_monitor.h"
 #include "tmc2209.h"
 #include "common.h"
+#include "target.h"
+
 
 
 #define ADC_TEMP_CH 4
@@ -20,21 +24,31 @@
 #define STEPS_PER_REV 200
 #define STEPPING_MODE 1
 #define GEAR_RATIO 3.2
+#define GP19 19
 
-#define DIR_PIN    10
-#define STEP_PIN   11
-#define NSLEEP     12
-#define NRST       13
-#define EN_PIN     15
+
+// #define NSLEEP     12
+// #define NRST       13
+#define EN_A     28
+#define EN_B 22
 #define SLEEP_PIN  17 //any GPIO pin
-
-#define ENCODER_A  7
-#define ENCODER_B  8
+#define LED_PIN 25
+#define ENCODER_A  12
+#define ENCODER_B  13
+#define MS2A 21
+#define MS2B 20
+#define MS1B 26
+#define MS1A 27
 // Define constants for 12-hour cycle
 #define TWELVE_HOURS_IN_SECONDS 43200
 
-#define UART_INSTANCE  uart1
+#define UART_INSTANCE  uart0
 #define UART_PARITY_NONE 0
+
+volatile bool led_state = false;
+volatile bool step_active = false;
+volatile bool motor_on_state = false;
+
 
 
 /*
@@ -60,21 +74,21 @@ void sleep_for(uint32_t duration_seconds) {
 }
 
 
-void sleep_ISR() {
-    //Interrupt Service Routine for Sleeping.
-    gpio_put(EN_PIN, 0);
+// void sleep_ISR() {
+//     //Interrupt Service Routine for Sleeping.
+//     gpio_put(EN_A, 0);
 
-    // // Go to sleep until we see a high edge on GPIO 10
-    // sleep_goto_dormant_until_edge_high(17);
-}
+//     // // Go to sleep until we see a high edge on GPIO 10
+//     // sleep_goto_dormant_until_edge_high(17);
+// }
 
-void awake_ISR() {
-    //Interrupt Service Routine for Sleeping.
-    gpio_put(EN_PIN, 1);
+// void awake_ISR() {
+//     //Interrupt Service Routine for Sleeping.
+//     gpio_put(EN_A, 1);
 
-    // // Go to sleep until we see a high edge on GPIO 10
-    // sleep_goto_dormant_until_edge_high(17);
-}
+//     // // Go to sleep until we see a high edge on GPIO 10
+//     // sleep_goto_dormant_until_edge_high(17);
+// }
 
 
 int position = 0;
@@ -100,131 +114,193 @@ void encoder_callback(uint gpio, uint32_t event) {
                 position = position + 2000;
             };
             break;
+        // printf("position: %d\n",position);
     }
 
 }
 
+
+
+
+
+scheduler kernal;
+// // Create a TMC2209 driver instance
+TMC2209_t driver_X;
+TMC2209_t driver_Y;
+// Define any necessary global variables
+trinamic_motor_t motor_x;
+trinamic_motor_t motor_y;
+
+
+
+void led_toggle_task(void) {
+    led_state = !led_state;
+    gpio_put(STEP_Y, led_state);
+    gpio_put(25,led_state);
+
+}
+
+void motor_step_task(void) {
+    // switch (step_active) {
+    //     case false:
+    //         step_active = motor_step(&motor_x);
+    //         break;
+    //     case true:
+    //         step_active = motor_step(&motor_x);
+    // }
+    motor_on_state = !motor_on_state;
+    gpio_put(STEP_X, motor_on_state);
+
+}
+void get_current_task(void) {
+    printf("current motor_x: %d \n",TMC2209_GetCurrent(&driver_X));
+    printf("current motor_y: %d \n",TMC2209_GetCurrent(&driver_Y));
+}
 int main() {
+    gpio_put(DIR_X,1);
     stdio_init_all();
     
-    // Initialise UART 0
-    // Initialize the UART with a baud rate (e.g., 9600)
-    uart_init(UART_INSTANCE, 9600);
-
-    // Set UART format (8 data bits, 1 stop bit, no parity)
-    uart_set_format(UART_INSTANCE, 8, 1, UART_PARITY_NONE);
     
-     // Set the GPIO pin mux to the UART - 0 is TX, 1 is RX
-    gpio_set_function(4, GPIO_FUNC_UART);
-    gpio_set_function(5, GPIO_FUNC_UART);
-    // Create a TMC2209 driver instance
-    TMC2209_t driver_instance;
+    gpio_init(LED_PIN);
+    gpio_set_dir(LED_PIN, GPIO_OUT);
 
-    // Get default configuration parameters
-    const trinamic_cfg_params_t *default_params = TMC2209_GetConfigDefaults();
+    gpio_init(GP19);
+    gpio_init(STEP_X);
+    gpio_init(STEP_Y);
+    gpio_init(EN_A);
+    gpio_init(EN_B);
+    // gpio_init(NRST);
+    gpio_init(DIR_X);
+    gpio_init(DIR_Y);
+    gpio_init(MS1A);
+    gpio_init(MS1B);
+    gpio_init(MS2A);
+    gpio_init(MS2B);
 
-    // Initialize the driver instance with default values
-    TMC2209_SetDefaults(&driver_instance);
-
-    // Initialize the driver
-    bool init_success = TMC2209_Init(&driver_instance);
-        // Set the desired VACTUAL value
-    //uint32_t newVACTUAL = 11930; // Set to your desired value
-
-    // // Prepare the datagram
-    // TMC2209_datagram_t vactual_datagram;
-    // vactual_datagram.addr.reg = TMC2209Reg_VACTUAL;
-    // vactual_datagram.payload.vactual.value = newVACTUAL;
-    // vactual_datagram.payload.tpwmthrs.value = 1406;
-
-    // // Write the updated VACTUAL value to the driver
-    // bool success = TMC2209_WriteRegister(&driver_instance, &vactual_datagram);
-    
-    
-
-
-    gpio_init(STEP_PIN);
-    gpio_init(EN_PIN);
-    gpio_init(NRST);
-    gpio_init(DIR_PIN);
-    gpio_init(NSLEEP);
+    // gpio_init(NSLEEP);
     gpio_init(SLEEP_PIN);
     gpio_init(25);
     gpio_init(ENCODER_A);
     gpio_init(ENCODER_B);
-    gpio_set_dir(STEP_PIN, GPIO_OUT);
-    gpio_set_dir(EN_PIN, GPIO_OUT);
-    gpio_set_dir(NRST, GPIO_OUT);
-    gpio_set_dir(DIR_PIN, GPIO_OUT);
-    gpio_set_dir(NSLEEP, GPIO_OUT);
+    gpio_set_dir(GP19, GPIO_OUT);
+    gpio_set_dir(STEP_X, GPIO_OUT);
+    gpio_set_dir(STEP_Y, GPIO_OUT);
+    gpio_set_dir(EN_A, GPIO_OUT);
+    gpio_set_dir(EN_B, GPIO_OUT);
+    // gpio_set_dir(NRST, GPIO_OUT);
+    gpio_set_dir(DIR_X, GPIO_OUT);
+    gpio_set_dir(DIR_Y, GPIO_OUT);
+    // gpio_set_dir(NSLEEP, GPIO_OUT);
+    gpio_set_dir(MS1A, GPIO_OUT);
+    gpio_set_dir(MS1B, GPIO_OUT);
+    gpio_set_dir(MS2A, GPIO_OUT);
+    gpio_set_dir(MS2B, GPIO_OUT);
     gpio_set_dir(SLEEP_PIN, GPIO_IN);
     gpio_set_dir(25, GPIO_OUT);
     gpio_set_dir(ENCODER_A, GPIO_IN);
     gpio_set_dir(ENCODER_B, GPIO_IN);
 
-    gpio_put(DIR_PIN, 1);
-    gpio_put(STEP_PIN, 0);
-    gpio_put(EN_PIN, 0);
-    gpio_put(NSLEEP, 1);
-    gpio_put(NRST, 1);
-
-   
-
- 
-    // Set the GPIO pin mux to the UART - 0 is TX, 1 is RX
-    gpio_set_function(12, GPIO_FUNC_UART);
-    gpio_set_function(13, GPIO_FUNC_UART);
-
-    uart_set_fifo_enabled(UART_INSTANCE, 1);
-    uart_putc(uart0, 0x4);
-
-        	/* Initiate asynchronous ADC temperature sensor reads */
-	adc_init();
-    adc_gpio_init(26);
-	adc_select_input(0);
-	adc_irq_set_enabled(true);
-    /* Write to FIFO length 1, and retain the ERR bit. */
-	adc_fifo_setup(true, false, 1, false, true);
-	adc_set_clkdiv(ADC_MAX_CLKDIV);
+  
+    gpio_put(LED_PIN, 0);
     
-	irq_set_exclusive_handler(ADC_IRQ_FIFO, adc_isr);
-	
-	irq_set_enabled(ADC_IRQ_FIFO, true);
-	adc_run(true);
+    gpio_put(GP19, 0);
+    gpio_put(DIR_X, 1);
+    gpio_put(STEP_X, 1);
+    gpio_put(DIR_Y, 1);
+    gpio_put(STEP_Y, 1);
+    gpio_put(EN_A, 0);
+    gpio_put(EN_B, 0);
+    gpio_put(MS1A, 0);
+    gpio_put(MS1B, 0);
+    gpio_put(MS2A, 1);
+    gpio_put(MS2B, 0);
+    // gpio_put(NSLEEP, 1);
+    // gpio_put(NRST, 1);
+
+       // Initialise UART 0
+    // Initialize the UART with a baud rate (e.g., 9600)
+    uart_init(UART_INSTANCE, 115200);
+
+    // Set UART format (8 data bits, 1 stop bit, no parity)
+    uart_set_format(UART_INSTANCE, 8, 1, UART_PARITY_NONE);
     
+     // Set the GPIO pin mux to the UART - 16 is TX, 17 is RX
+    gpio_set_function(16, GPIO_FUNC_UART);
+    gpio_set_function(17, GPIO_FUNC_UART);
+    // took soo long to find but this stops default UART0 pins interfaring with stuff
+    gpio_set_function(0, GPIO_FUNC_NULL);
+    gpio_set_function(1, GPIO_FUNC_NULL);
+    
+    // uart_set_fifo_enabled(UART_INSTANCE, 1);
+
+
+
+    initialize_motors(&motor_x, &motor_y);
+
+    // Get default configuration parameters
+    const trinamic_cfg_params_t *default_params = TMC2209_GetConfigDefaults();
+
+    // Initialize the driver instance with default values
+    TMC2209_SetDefaults(&driver_X);
+    TMC2209_SetDefaults(&driver_Y);
+    driver_X.config.motor = motor_x;
+    driver_Y.config.motor = motor_y;
+    // Initialize the drivers 
+    TMC2209_datagram_t test_datagram;
+    test_datagram.payload.ioin.ms1;
+    
+    
+    
+    //while(1) {printf("success: dir = %x \n",test_datagram.payload.ioin.dir);}
+    bool init_success_x = TMC2209_Init(&driver_X);
+    bool init_success_y = TMC2209_Init(&driver_Y);
+    
+    TMC2209_SetMicrosteps(&driver_X, TMC2209_Microsteps_128);
+    TMC2209_SetCurrent (&driver_X, 100, 50);
+    TMC2209_SetCurrent (&driver_Y, 100, 50);
+
     gpio_set_irq_enabled_with_callback(ENCODER_A,0x4|0x8,1, encoder_callback);
     gpio_set_irq_enabled_with_callback(ENCODER_B,0x4|0x8,1, encoder_callback);
     sleep_ms(5000);
 
+        
 
     
 
  
-    //initStepperMotorPWM(STEP_PIN, DEFAULT_MOTOR_RPM*STEPPING_MODE);
+    //initStepperMotorPWM(STEP_X, DEFAULT_MOTOR_RPM*STEPPING_MODE);
     // Set up interrupt handler for the button press
     //gpio_set_irq_enabled(SLEEP_PIN, GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE, true);
     //gpio_set_irq_enabled_with_callback(SLEEP_PIN, GPIO_IRQ_EDGE_FALL, true, &sleep_ISR);
     //gpio_set_irq_enabled_with_callback(SLEEP_PIN, GPIO_IRQ_EDGE_RISE, true, &awake_ISR);
-    bool on_state = true;
-    const uint LED_PIN = PICO_DEFAULT_LED_PIN;
-    gpio_init(LED_PIN);
-    gpio_set_dir(LED_PIN, GPIO_OUT);
-
+    // bool on_state = true;
+    // const uint LED_PIN = PICO_DEFAULT_LED_PIN;
+    kernal.tickPeriod = 100;
+    kernal_init();
+    struct repeating_timer timer;
+    add_repeating_timer_us(kernal.tickPeriod, alarm_callback, NULL, &timer);
+    taskId_t led_toggle_task_id = register_task(led_toggle_task,1,100);
+    taskId_t motor_step_task_id = register_task(motor_step_task,2,500);
+    //taskId_t get_current_task_id = register_task(get_current_task,3,1000000);
     while(1) {
-\
+         
         
-        printf("current: %d\n", TMC2209_GetCurrent (&driver_instance));
+       kernal_start();
+        //printf("success");
+    
+        // printf("current: %d\n", TMC2209_GetCurrent (&driver_X));
         // 12-bit conversion, assume max value == ADC_VREF == 3.3 V
          
         // uint16_t result = adc_read();
-        if (adc_avail) {
-            //printf("voltage: %f \n", voltage );
-            adc_avail=0;
-        };
+        // if (adc_avail) {
+        //     //printf("voltage: %f \n", voltage );
+        //     adc_avail=0;
+        // };
         // sleep_ms(500);
         // gpio_put(LED_PIN, 1);
         // sleep_ms(250);
         // gpio_put(LED_PIN, 0);
+        
         // sleep_ms(250);
         // if (on_state & gpio_get(SLEEP_PIN)) {
         //     gpio_put(EN_PIN, 0);
@@ -236,7 +312,9 @@ int main() {
         //     on_state = true;
         // }
         
-        rotateStepperMotor(STEP_PIN, 51200);//STEPPING_MODE*STEPS_PER_REV*GEAR_RATIO/10);
+       // rotateStepperMotor(&motor_x, 51200);//STEPPING_MODE*STEPS_PER_REV*GEAR_RATIO/10);
+        //rotateStepperMotor(&motor_y, 51200);//STEPPING_MODE*STEPS_PER_REV*GEAR_RATIO/10);
+
         //sleep_ms(10000);
 
         // if (gpio_get(SLEEP_PIN) == 0) {

@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define MAX_TASKS 100
+#define MAX_TASKS 5
 #define KERNAL_PERIOD_US 10000
 typedef struct 
 {

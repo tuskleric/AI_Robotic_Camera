@@ -43,11 +43,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <stdbool.h>
 #include "hardware/uart.h"
+#include "hardware/gpio.h"
+#include "pico/stdlib.h"
+
 
 #define TMC_N_MOTORS_MAX    6  // max number of Trinamic drivers
 #define TMC_THRESHOLD_MIN   0
 #define TMC_THRESHOLD_MAX   ((1<<20) - 1)
-#define UART_INSTANCE uart1
+
+#define LED_PIN  25
+#define UART_INSTANCE uart0
 typedef union {
     uint32_t value;
     struct {
@@ -112,6 +117,9 @@ typedef struct {
     uint8_t address;    // UART address
     uint8_t seq;        // optional motor sequence number (for chained SPI drivers)
     void *cs_pin;       // optional CS pin data for the stepper driver
+    uint8_t dir_pin;    // Direction pin
+    uint8_t step_pin;   // Step pin
+
 } trinamic_motor_t;
 
 typedef struct {

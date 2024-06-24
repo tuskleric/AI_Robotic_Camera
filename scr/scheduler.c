@@ -10,27 +10,20 @@
 
 
 //systick callback function
-bool alarm_callback(struct repeating_timer *t)
-{
-    printf("numTasks %d \n", kernal.numTasks);
-    for (uint8_t i =0; i <= kernal.numTasks; i++)
-    {
-        printf("I %d\n",i);
-        printf("kernal period   %lld\n",kernal.tickPeriod);
-        printf("kernal_task period   %lld\n",kernal.tasks[i].period);
-        kernal.tasks[i].taskTick ++;
-        printf("kernal_task tick   %lld\n",kernal.tasks[i].taskTick);
-        if( kernal.tasks[i].taskTick >= (kernal.tasks[i].period / kernal.tickPeriod)) {
+bool alarm_callback(struct repeating_timer *t) {
+    for (uint8_t i = 0; i < kernal.numTasks; i++) {
+        kernal.tasks[i].taskTick++;
+        if (kernal.tasks[i].taskTick >= (kernal.tasks[i].period / kernal.tickPeriod)) {
             kernal.tasks[i].taskTick = 0;
             kernal.tasks[i].ready = true;
-            printf("not stuck %lld\n",kernal.tasks[i].taskTick);
         }
     }
+    return true; // Continue calling the callback
 }
 
 
 
-void kernal_init(void)
+void kernal_init()
 {
     kernal.numTasks = 0;
 
@@ -49,6 +42,7 @@ taskId_t register_task(void(*taskEnter)(void), uint8_t priority, int64_t period)
         kernal.tasks[newTaskId.Id].priority = priority;
         kernal.tasks[newTaskId.Id].run = taskEnter;
         kernal.numTasks ++;
+        printf("task_id %d\n", newTaskId);
         printf("task_id %d\n", kernal.tasks[newTaskId.Id].id.Id);
         printf("task_id returned %d\n", newTaskId.Id);
         return newTaskId;
@@ -68,12 +62,14 @@ void kernal_start(void)
     uint8_t taskToRun = 0xFF; // INVALID task ID
     
     for (uint8_t i = 0; i < kernal.numTasks; i++) {
+        //printf("here?? %d\n", kernal.tasks[i].ready);
         if (kernal.tasks[i].ready && kernal.tasks[i].priority < highestPriority) {
+            //printf("getting here\n");
             highestPriority = kernal.tasks[i].priority;
             taskToRun = i;
         }
     }
-
+    
     //run the highest priority task (lowest priority number)
     if (taskToRun != 0xFF) {
        // printf("pre-run");
