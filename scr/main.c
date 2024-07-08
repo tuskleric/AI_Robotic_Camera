@@ -155,7 +155,7 @@ int main() {
         printf("%d %d\n", tester, position);
         uint16_t dist = 0;
         dist = (tester[1] << 8) | tester[0];
-        rotateStepperMotor(STEP_PIN, STEPPING_MODE*STEPS_PER_REV*dist/360);
+        rotateStepperMotor(STEP_PIN, STEPPING_MODE*STEPS_PER_REV*200/360);
         tester[0] = 0;
         tester[1] = 0;
         sleep_ms(500);

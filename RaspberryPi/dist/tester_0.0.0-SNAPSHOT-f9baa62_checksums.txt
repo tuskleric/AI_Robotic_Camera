@@ -1,2 +1,0 @@
-0a2720bca97781c8cf910724d4f2154fbc878702abf0392b1d4f9e23c39fc821  tester_0.0.0-SNAPSHOT-f9baa62_arm.deb
-70c7b2d1bf52d351df3ac22f95ab0809df8ca8d2fe253e76edcf2bb8195c0187  tester_0.0.0-SNAPSHOT-f9baa62_linux_armv7.tar.gz

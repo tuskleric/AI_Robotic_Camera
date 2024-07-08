@@ -1,15 +1,92 @@
+// package main
+
+// import (
+// 	"fmt"
+// 	"log"
+// 	"math/rand"
+// 	"time"
+
+// 	"periph.io/x/conn/v3/i2c"
+// 	"periph.io/x/conn/v3/i2c/i2creg"
+// 	"periph.io/x/host/v3"
+// 	"github.com/godbus/dbus/v5"
+// )
+
 package main
 
 import (
 	"fmt"
 	"log"
 	"math/rand"
+	"os"
 	"time"
 
+	"github.com/godbus/dbus/v5"
 	"periph.io/x/conn/v3/i2c"
 	"periph.io/x/conn/v3/i2c/i2creg"
 	"periph.io/x/host/v3"
 )
+
+// func main() {
+// 	conn, err := dbus.ConnectSystemBus()
+// 	if err != nil {
+// 		fmt.Fprintln(os.Stderr, "Failed to connect to session bus:", err)
+// 		os.Exit(1)
+// 	}
+// 	defer conn.Close()
+
+// 	reader := bufio.NewReader(os.Stdin)
+// 	fmt.Print("Enter an integer: ")
+// 	input, _ := reader.ReadString('\n')
+// 	input = strings.TrimSpace(input)
+// 	number, err := strconv.Atoi(input)
+// 	if err != nil {
+// 		fmt.Println("Error: Invalid input. Please enter a valid integer.")
+// 		return
+// 	}
+
+// 	signalData := number
+
+// 	// Emitting a signal
+// 	err = conn.Emit(dbus.ObjectPath("/org/cacophony/DBus/test"), "org.cacophony.DBus.test.NameLost", signalData)
+// 	if err != nil {
+// 		fmt.Fprintln(os.Stderr, "Failed to emit signal:", err)
+// 		os.Exit(1)
+// 	}
+
+// 	fmt.Println("Signal emitted successfully!")
+
+// 	// Sleep to allow time for the signal to be processed (optional)
+// 	time.Sleep(1 * time.Second)
+// }
+
+func main() {
+	conn, err := dbus.ConnectSystemBus()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Failed to connect to session bus:", err)
+		os.Exit(1)
+	}
+	defer conn.Close()
+
+	// Add match for the specific signal you want to receive
+	if err := conn.AddMatchSignal(
+		dbus.WithMatchObjectPath("/org/cacophony/DBus/test"), //"/org/freedesktop/DBus"),
+		dbus.WithMatchInterface("org.cacophony.DBus.test"),   //"org.freedesktop.DBus"),
+	); err != nil {
+		panic(err)
+	}
+
+	// Channel to receive signals
+	c := make(chan *dbus.Signal, 10)
+	conn.Signal(c)
+
+	// Listening for signals
+	for signal := range c {
+		// Print the content of the signal
+		fmt.Printf("Received signal: Path=%s, Sender=%s, Body=%v\n",
+			signal.Path, signal.Sender, signal.Body)
+	}
+}
 
 func main() {
 	// Initialize periph
