@@ -1,1 +1,1 @@
-{"project_name":"tester2","tag":"v0.0.0","previous_tag":"","version":"0.0.0-SNAPSHOT-23000f8","commit":"23000f81d41d76ea27c0664bbdbf8fef29268f80","date":"2024-07-08T12:30:06.3272651+12:00","runtime":{"goos":"windows","goarch":"amd64"}}
+{"project_name":"tester","tag":"v0.0.0","previous_tag":"","version":"0.0.0-SNAPSHOT-35321a6","commit":"35321a63fe448f54d8fabc2636492656f2d41b40","date":"2024-07-08T12:56:16.1109132+12:00","runtime":{"goos":"windows","goarch":"amd64"}}

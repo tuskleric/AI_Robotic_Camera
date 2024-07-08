@@ -1,4 +1,4 @@
-project_name: tester2
+project_name: tester
 release:
   github:
     owner: TheCacophonyProject
@@ -20,7 +20,7 @@ builds:
       - linux_arm_7
     dir: .
     main: ./test.go
-    binary: testfoo2
+    binary: testfoo
     builder: go
     gobinary: go
     command: build
@@ -39,7 +39,7 @@ archives:
       - src: CHANGELOG*
 nfpms:
   - file_name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Arch }}'
-    package_name: tester2
+    package_name: tester
     id: default
     formats:
       - deb
