@@ -66,12 +66,12 @@ void encoder_callback(uint gpio, uint32_t event) {
 
 }
 
-uint8_t tester[2];
+uint8_t tester[1];
 
 void I2CIRQHandler() {
 
     uint32_t intr_stat = i2c0->hw->intr_stat;
-    i2c_read_blocking (i2c_default, 0x15, &tester, 2, true);
+    i2c_read_blocking (i2c_default, 0x15, &tester, 1, true);
     
     // if (intr_stat & I2C_IC_INTR_STAT_R_RX_FULL_BITS) {
     //     i2c_read_blocking (i2c_default, 0x15, &tester, 1, true);
@@ -152,13 +152,26 @@ int main() {
 
     while(1) {
 
-        printf("%d %d\n", tester, position);
-        uint16_t dist = 0;
-        dist = (tester[1] << 8) | tester[0];
-        rotateStepperMotor(STEP_PIN, STEPPING_MODE*STEPS_PER_REV*200/360);
-        tester[0] = 0;
-        tester[1] = 0;
-        sleep_ms(500);
+        //printf("%d\n", position);
+        int16_t dist = 0;
+        dist = tester[0]*40; // (tester[1] << 8) | tester[0];
+
+        int16_t movement = dist - position;
+
+        if (tester[0] != 0) {
+            printf("%d wowowow\n", STEPPING_MODE*STEPS_PER_REV/360*movement/4000);
+            if (movement < 0) {
+                movement *= -1;
+                gpio_put(DIR_PIN, 0);
+            } else {
+                gpio_put(DIR_PIN, 1);
+            }
+
+            rotateStepperMotor(STEP_PIN, STEPPING_MODE*STEPS_PER_REV/360*movement/4000);
+            tester[0] = 0;
+            tester[1] = 0;
+        }
+        
 
         // if (!on_state & gpio_get(SLEEP_PIN)) {
         //     gpio_put(EN_PIN, 0);
