@@ -13,7 +13,7 @@
 bool alarm_callback(struct repeating_timer *t) {
     for (uint8_t i = 0; i < kernal.numTasks; i++) {
         kernal.tasks[i].taskTick++;
-        if (kernal.tasks[i].taskTick >= (kernal.tasks[i].period / kernal.tickPeriod)) {
+        if (kernal.tasks[i].taskTick >= ((MICRO_FREQ_TO_PERIOD/(kernal.tasks[i].freq)) / kernal.tickPeriod)) {
             kernal.tasks[i].taskTick = 0;
             kernal.tasks[i].ready = true;
         }
@@ -29,14 +29,14 @@ void kernal_init()
 
 }
 
-taskId_t register_task(void(*taskEnter)(void), uint8_t priority, int64_t period) 
+taskId_t register_task(void(*taskEnter)(void), uint8_t priority, int64_t freq) 
 {
     if (kernal.numTasks < MAX_TASKS) 
     {
         
         taskId_t newTaskId;
         newTaskId.Id = kernal.numTasks;
-        kernal.tasks[newTaskId.Id].period = period;
+        kernal.tasks[newTaskId.Id].freq = freq;
         kernal.tasks[newTaskId.Id].taskTick = 0;
         kernal.tasks[newTaskId.Id].ready = false;
         kernal.tasks[newTaskId.Id].priority = priority;

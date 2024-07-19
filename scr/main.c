@@ -135,7 +135,7 @@ trinamic_motor_t motor_y;
 
 void led_toggle_task(void) {
     led_state = !led_state;
-    gpio_put(STEP_Y, led_state);
+    //gpio_put(STEP_Y, led_state);
     gpio_put(25,led_state);
 
 }
@@ -235,35 +235,35 @@ int main() {
 
 
 
-    initialize_motors(&motor_x, &motor_y);
+     initialize_motors(&motor_x, &motor_y);
 
-    // Get default configuration parameters
-    const trinamic_cfg_params_t *default_params = TMC2209_GetConfigDefaults();
+    // // Get default configuration parameters
+    // const trinamic_cfg_params_t *default_params = TMC2209_GetConfigDefaults();
 
-    // Initialize the driver instance with default values
-    TMC2209_SetDefaults(&driver_X);
-    TMC2209_SetDefaults(&driver_Y);
-    driver_X.config.motor = motor_x;
-    driver_Y.config.motor = motor_y;
-    // Initialize the drivers 
-    TMC2209_datagram_t test_datagram;
-    test_datagram.payload.ioin.ms1;
+    // // Initialize the driver instance with default values
+    // TMC2209_SetDefaults(&driver_X);
+    // TMC2209_SetDefaults(&driver_Y);
+    // driver_X.config.motor = motor_x;
+    // driver_Y.config.motor = motor_y;
+    // // Initialize the drivers 
+    // TMC2209_datagram_t test_datagram;
+    // test_datagram.payload.ioin.ms1;
     
     
     
-    //while(1) {printf("success: dir = %x \n",test_datagram.payload.ioin.dir);}
-    bool init_success_x = TMC2209_Init(&driver_X);
-    bool init_success_y = TMC2209_Init(&driver_Y);
+    // //while(1) {printf("success: dir = %x \n",test_datagram.payload.ioin.dir);}
+    // bool init_success_x = TMC2209_Init(&driver_X);
+    // bool init_success_y = TMC2209_Init(&driver_Y);
     
-    TMC2209_SetMicrosteps(&driver_X, TMC2209_Microsteps_128);
-    TMC2209_SetCurrent (&driver_X, 100, 50);
-    TMC2209_SetCurrent (&driver_Y, 100, 50);
+    // TMC2209_SetMicrosteps(&driver_X, TMC2209_Microsteps_128);
+    // TMC2209_SetCurrent (&driver_X, 100, 50);
+    // TMC2209_SetCurrent (&driver_Y, 100, 50);
 
     gpio_set_irq_enabled_with_callback(ENCODER_A,0x4|0x8,1, encoder_callback);
     gpio_set_irq_enabled_with_callback(ENCODER_B,0x4|0x8,1, encoder_callback);
     sleep_ms(5000);
-
-        
+    gpio_put(25,1);
+  
 
     
 
@@ -275,18 +275,22 @@ int main() {
     //gpio_set_irq_enabled_with_callback(SLEEP_PIN, GPIO_IRQ_EDGE_RISE, true, &awake_ISR);
     // bool on_state = true;
     // const uint LED_PIN = PICO_DEFAULT_LED_PIN;
-    kernal.tickPeriod = 100;
+    kernal.tickPeriod = 100;  // in microseconds ----> 10KHz
     kernal_init();
+
+
+    //task frequency must be less then 10KHz
     struct repeating_timer timer;
     add_repeating_timer_us(kernal.tickPeriod, alarm_callback, NULL, &timer);
-    taskId_t led_toggle_task_id = register_task(led_toggle_task,1,100);
-    taskId_t motor_step_task_id = register_task(motor_step_task,2,500);
+    taskId_t led_toggle_task_id = register_task(led_toggle_task,1,5);
+
+    //taskId_t motor_step_task_id = register_task(motor_step_task,2,500);
     //taskId_t get_current_task_id = register_task(get_current_task,3,1000000);
     while(1) {
          
         
        kernal_start();
-        //printf("success");
+       printf("success");
     
         // printf("current: %d\n", TMC2209_GetCurrent (&driver_X));
         // 12-bit conversion, assume max value == ADC_VREF == 3.3 V

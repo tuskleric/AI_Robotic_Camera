@@ -6,6 +6,7 @@
 
 #define MAX_TASKS 5
 #define KERNAL_PERIOD_US 10000
+#define MICRO_FREQ_TO_PERIOD 1000000
 typedef struct 
 {
     uint16_t Id;
@@ -14,7 +15,7 @@ typedef struct
 typedef struct 
 {
    taskId_t id;
-   int64_t  period;
+   int64_t  freq;
    int64_t taskTick;
    bool ready;
    uint8_t priority;
@@ -40,7 +41,7 @@ typedef struct
 //set the period for systick interrupts
 void kernal_init(void);
 
-taskId_t register_task(void(*taskEnter)(void), uint8_t priority, int64_t period);
+taskId_t register_task(void(*taskEnter)(void), uint8_t priority, int64_t freq);
 
 void kernal_start(void);
 
