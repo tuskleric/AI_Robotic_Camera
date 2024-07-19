@@ -131,19 +131,19 @@ int32_t target_x_angle = 0;
 void led_toggle_task(void) {
     led_state = !led_state;
     gpio_put(25,led_state);
-    printf("wow %d", position);
+    //printf("wow %d", position);
 
 }
 
 void motor_tilt_step_task(void) {
 
-    // if (y_coord < (-90*STEPS_PER_REV*STEPPING_MODE*GEAR_RATIO_TILT/360)){
-    //     gpio_put(DIR_Y, 0);
-    //     y_coord += motory_on_state;
-    // } else {
-    //     gpio_put(DIR_Y, 1);
-    //     y_coord -= motory_on_state;
-    // }
+    if (y_coord < (90*STEPS_PER_REV*STEPPING_MODE*GEAR_RATIO_TILT/360)){
+        gpio_put(DIR_Y, 0);
+        y_coord += motory_on_state;
+    } else {
+        gpio_put(DIR_Y, 1);
+        y_coord -= motory_on_state;
+    }
     motory_on_state = !motory_on_state;
     gpio_put(STEP_Y, motory_on_state);
 
@@ -151,13 +151,13 @@ void motor_tilt_step_task(void) {
 
 void motor_pan_step_task(void) {
 
-    // if (x_coord < (-90*STEPS_PER_REV*STEPPING_MODE*GEAR_RATIO_TILT/360)){
-    //     gpio_put(DIR_X, 0);
-    //     x_coord -= motorx_on_state;
-    // } else {
-    //     gpio_put(DIR_X, 1);
-    //     x_coord -= motorx_on_state;
-    // }
+    if (x_coord < (90*STEPS_PER_REV*STEPPING_MODE*GEAR_RATIO_TILT/360)){
+        gpio_put(DIR_X, 0);
+        x_coord -= motorx_on_state;
+    } else {
+        gpio_put(DIR_X, 1);
+        x_coord -= motorx_on_state;
+    }
     motorx_on_state = !motorx_on_state;
     gpio_put(STEP_X, motorx_on_state);
 
@@ -220,7 +220,7 @@ int main() {
     gpio_put(STEP_Y, 1);
     gpio_put(EN_A, 0);
     gpio_put(EN_B, 0);
-    gpio_put(MS1A, 0);
+    gpio_put(MS1A, 1);
     gpio_put(MS1B, 0);
     gpio_put(MS2A, 1);
     gpio_put(MS2B, 0);
