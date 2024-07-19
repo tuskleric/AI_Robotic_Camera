@@ -23,7 +23,8 @@
 #define DEFAULT_MOTOR_RPM 1
 #define STEPS_PER_REV 200
 #define STEPPING_MODE 1
-#define GEAR_RATIO 3.2
+#define GEAR_RATIO_PAN 100/18
+#define GEAR_RATIO_TILT 30
 #define GP19 19
 
 
@@ -33,8 +34,8 @@
 #define EN_B 22
 #define SLEEP_PIN  17 //any GPIO pin
 #define LED_PIN 25
-#define ENCODER_A  12
-#define ENCODER_B  13
+#define ENCODER_A  4
+#define ENCODER_B  5
 #define MS2A 21
 #define MS2B 20
 #define MS1B 26
@@ -47,7 +48,8 @@
 
 volatile bool led_state = false;
 volatile bool step_active = false;
-volatile bool motor_on_state = false;
+volatile bool motorx_on_state = false;
+volatile bool motory_on_state = false;
 
 
 
@@ -98,27 +100,14 @@ void encoder_callback(uint gpio, uint32_t event) {
     {
         case GPIO_IRQ_EDGE_FALL:
             position += (ENCODER_A == gpio)*((gpio_get(ENCODER_B)) ? -1 : 1) + (ENCODER_B == gpio)*((gpio_get(ENCODER_A)) ? 1 : -1);
-            if (position >=2000) {
-                position = position -2000;
-            };
-            if (position <= -2000) {
-                position = position + 2000;
-            };
             break;
         case GPIO_IRQ_EDGE_RISE:
             position += (ENCODER_A == gpio)*((gpio_get(ENCODER_B)) ? 1 : -1) + (ENCODER_B == gpio)*((gpio_get(ENCODER_A)) ? -1 : 1);
-            if (position >=2000) {
-                position = position -2000;
-            };
-            if (position <= -2000) {
-                position = position + 2000;
-            };
             break;
         // printf("position: %d\n",position);
     }
 
 }
-
 
 
 
@@ -133,23 +122,44 @@ trinamic_motor_t motor_y;
 
 
 
+int32_t x_coord = 0;
+int32_t y_coord = 0;
+int32_t target_x_angle = 0;
+
+
+
 void led_toggle_task(void) {
     led_state = !led_state;
-    //gpio_put(STEP_Y, led_state);
     gpio_put(25,led_state);
+    printf("wow %d", position);
 
 }
 
-void motor_step_task(void) {
-    // switch (step_active) {
-    //     case false:
-    //         step_active = motor_step(&motor_x);
-    //         break;
-    //     case true:
-    //         step_active = motor_step(&motor_x);
+void motor_tilt_step_task(void) {
+
+    // if (y_coord < (-90*STEPS_PER_REV*STEPPING_MODE*GEAR_RATIO_TILT/360)){
+    //     gpio_put(DIR_Y, 0);
+    //     y_coord += motory_on_state;
+    // } else {
+    //     gpio_put(DIR_Y, 1);
+    //     y_coord -= motory_on_state;
     // }
-    motor_on_state = !motor_on_state;
-    gpio_put(STEP_X, motor_on_state);
+    motory_on_state = !motory_on_state;
+    gpio_put(STEP_Y, motory_on_state);
+
+}
+
+void motor_pan_step_task(void) {
+
+    // if (x_coord < (-90*STEPS_PER_REV*STEPPING_MODE*GEAR_RATIO_TILT/360)){
+    //     gpio_put(DIR_X, 0);
+    //     x_coord -= motorx_on_state;
+    // } else {
+    //     gpio_put(DIR_X, 1);
+    //     x_coord -= motorx_on_state;
+    // }
+    motorx_on_state = !motorx_on_state;
+    gpio_put(STEP_X, motorx_on_state);
 
 }
 void get_current_task(void) {
@@ -261,7 +271,7 @@ int main() {
 
     gpio_set_irq_enabled_with_callback(ENCODER_A,0x4|0x8,1, encoder_callback);
     gpio_set_irq_enabled_with_callback(ENCODER_B,0x4|0x8,1, encoder_callback);
-    sleep_ms(5000);
+    sleep_ms(1000);
     gpio_put(25,1);
   
 
@@ -284,13 +294,15 @@ int main() {
     add_repeating_timer_us(kernal.tickPeriod, alarm_callback, NULL, &timer);
     taskId_t led_toggle_task_id = register_task(led_toggle_task,1,5);
 
-    //taskId_t motor_step_task_id = register_task(motor_step_task,2,500);
+    
+    taskId_t motor_tilt_step_task_id = register_task(motor_tilt_step_task,2,10000);
+    taskId_t motor_pan_step_task_id = register_task(motor_pan_step_task,2,10000);
     //taskId_t get_current_task_id = register_task(get_current_task,3,1000000);
     while(1) {
          
         
        kernal_start();
-       printf("success");
+       //printf("success");
     
         // printf("current: %d\n", TMC2209_GetCurrent (&driver_X));
         // 12-bit conversion, assume max value == ADC_VREF == 3.3 V
