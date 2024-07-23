@@ -6,6 +6,7 @@
 #include "hardware/pwm.h"
 #include "hardware/adc.h"
 #include "hardware/uart.h"
+#include "hardware/i2c.h"
 
 #include "scheduler.h"
 #include "tick.h"
@@ -92,6 +93,14 @@ void sleep_for(uint32_t duration_seconds) {
 //     // sleep_goto_dormant_until_edge_high(17);
 // }
 
+uint8_t tester[1] = {0};
+
+void I2CIRQHandler() {
+
+    uint32_t intr_stat = i2c1->hw->intr_stat;
+    i2c_read_blocking (i2c1, 0x15, &tester, 1, true);
+
+}
 
 int position = 0;
 
@@ -132,13 +141,13 @@ int buffer_index = 0;
 void led_toggle_task(void) {
     led_state = !led_state;
     gpio_put(25,led_state);
-    //printf("wow %d", position);
+    printf("wow %d", tester[0]);
 
 }
 
 void motor_tilt_step_task(void) {
 
-    if (y_coord < (90*STEPS_PER_REV*STEPPING_MODE*GEAR_RATIO_TILT/360)){
+    if (y_coord < (tester[0]*STEPS_PER_REV*STEPPING_MODE*GEAR_RATIO_TILT/360)){
         gpio_put(DIR_Y, 0);
         y_coord += motory_on_state;
     } else {
@@ -152,7 +161,7 @@ void motor_tilt_step_task(void) {
 
 void motor_pan_step_task(void) {
 
-    if (x_coord < (90*STEPS_PER_REV*STEPPING_MODE*GEAR_RATIO_PAN/360)){
+    if (x_coord < (0*STEPS_PER_REV*STEPPING_MODE*GEAR_RATIO_PAN/360)){
         gpio_put(DIR_X, 0);
         x_coord += motorx_on_state;
     } else {
@@ -243,9 +252,27 @@ int main() {
     
     // uart_set_fifo_enabled(UART_INSTANCE, 1);
 
+    // This example will use I2C0 on the default SDA and SCL pins (GP4, GP5 on a Pico)
+    i2c_init(i2c1, 100 * 1000);
+    i2c_set_slave_mode (i2c1, true, 0x15);
+    gpio_set_function(2, GPIO_FUNC_I2C);
+    gpio_set_function(3, GPIO_FUNC_I2C);
+    gpio_pull_up(2);
+    gpio_pull_up(3);
 
+    // Enable the I2C interrupts we want to process
+    i2c1->hw->intr_mask = (I2C_IC_INTR_MASK_M_RD_REQ_BITS | I2C_IC_INTR_MASK_M_RX_FULL_BITS);
 
-     initialize_motors(&motor_x, &motor_y);
+    // Set up the interrupt handler to service I2C interrupts
+    irq_set_exclusive_handler(I2C1_IRQ, I2CIRQHandler);
+        
+    // Enable I2C interrupt
+    irq_set_enabled(I2C1_IRQ, true);
+
+    // Make the I2C pins available to picotool
+    //bi_decl(bi_2pins_with_func(2, 3, GPIO_FUNC_I2C));
+
+    initialize_motors(&motor_x, &motor_y);
 
     // // Get default configuration parameters
     // const trinamic_cfg_params_t *default_params = TMC2209_GetConfigDefaults();

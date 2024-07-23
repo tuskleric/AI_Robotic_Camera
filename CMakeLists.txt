@@ -31,7 +31,7 @@ add_executable(main
 )
 
 # Link the required libraries
-target_link_libraries(main PRIVATE pico_stdlib pico_time hardware_pwm hardware_adc hardware_uart  )
+target_link_libraries(main PRIVATE pico_stdlib pico_time hardware_pwm hardware_adc hardware_uart hardware_i2c )
 
 # Add include directories
 target_include_directories(main PRIVATE ${PICO_SDK_PATH})
