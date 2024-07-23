@@ -93,12 +93,12 @@ void sleep_for(uint32_t duration_seconds) {
 //     // sleep_goto_dormant_until_edge_high(17);
 // }
 
-uint8_t tester[1] = {0};
+int8_t tester[2] = {0, 0};
 
 void I2CIRQHandler() {
 
     uint32_t intr_stat = i2c1->hw->intr_stat;
-    i2c_read_blocking (i2c1, 0x15, &tester, 1, true);
+    i2c_read_blocking (i2c1, 0x15, &tester, 2, true);
 
 }
 
@@ -141,7 +141,7 @@ int buffer_index = 0;
 void led_toggle_task(void) {
     led_state = !led_state;
     gpio_put(25,led_state);
-    printf("wow %d", tester[0]);
+    printf("wow %d %d\n", tester[0], tester[1]);
 
 }
 
@@ -150,26 +150,29 @@ void motor_tilt_step_task(void) {
     if (y_coord < (tester[0]*STEPS_PER_REV*STEPPING_MODE*GEAR_RATIO_TILT/360)){
         gpio_put(DIR_Y, 0);
         y_coord += motory_on_state;
-    } else {
+        motory_on_state = !motory_on_state;
+        gpio_put(STEP_Y, motory_on_state);
+    } else if (y_coord > (tester[0]*STEPS_PER_REV*STEPPING_MODE*GEAR_RATIO_TILT/360)){
         gpio_put(DIR_Y, 1);
         y_coord -= motory_on_state;
+        motory_on_state = !motory_on_state;
+        gpio_put(STEP_Y, motory_on_state);
     }
-    motory_on_state = !motory_on_state;
-    gpio_put(STEP_Y, motory_on_state);
-
 }
 
 void motor_pan_step_task(void) {
 
-    if (x_coord < (0*STEPS_PER_REV*STEPPING_MODE*GEAR_RATIO_PAN/360)){
+    if (x_coord < (tester[1]*STEPS_PER_REV*STEPPING_MODE*GEAR_RATIO_PAN/360)){
         gpio_put(DIR_X, 0);
         x_coord += motorx_on_state;
-    } else {
+        motorx_on_state = !motorx_on_state;
+        gpio_put(STEP_X, motorx_on_state);
+    } else if (x_coord > (tester[1]*STEPS_PER_REV*STEPPING_MODE*GEAR_RATIO_PAN/360)){
         gpio_put(DIR_X, 1);
         x_coord -= motorx_on_state;
+        motorx_on_state = !motorx_on_state;
+        gpio_put(STEP_X, motorx_on_state);
     }
-    motorx_on_state = !motorx_on_state;
-    gpio_put(STEP_X, motorx_on_state);
 
 }
 void get_current_task(void) {
@@ -312,7 +315,7 @@ int main() {
     //gpio_set_irq_enabled_with_callback(SLEEP_PIN, GPIO_IRQ_EDGE_RISE, true, &awake_ISR);
     // bool on_state = true;
     // const uint LED_PIN = PICO_DEFAULT_LED_PIN;
-    kernal.tickPeriod = 100;  // in microseconds ----> 10KHz
+    kernal.tickPeriod = 100;  // in microseconds ----> 100KHz
     kernal_init();
 
 
@@ -323,7 +326,7 @@ int main() {
 
     
     taskId_t motor_tilt_step_task_id = register_task(motor_tilt_step_task,2,10000);
-    taskId_t motor_pan_step_task_id = register_task(motor_pan_step_task,2,10000);
+    taskId_t motor_pan_step_task_id = register_task(motor_pan_step_task,2,1600);
     //taskId_t get_current_task_id = register_task(get_current_task,3,1000000);
     while(1) {
          
