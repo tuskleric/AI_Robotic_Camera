@@ -22,7 +22,7 @@
 
 #define DEFAULT_MOTOR_RPM 1
 #define STEPS_PER_REV 200
-#define STEPPING_MODE 1
+#define STEPPING_MODE 32
 #define GEAR_RATIO_PAN 100/18
 #define GEAR_RATIO_TILT 30
 #define GP19 19
@@ -126,7 +126,8 @@ int32_t x_coord = 0;
 int32_t y_coord = 0;
 int32_t target_x_angle = 0;
 
-
+char buffer[100];
+int buffer_index = 0;
 
 void led_toggle_task(void) {
     led_state = !led_state;
@@ -151,9 +152,9 @@ void motor_tilt_step_task(void) {
 
 void motor_pan_step_task(void) {
 
-    if (x_coord < (90*STEPS_PER_REV*STEPPING_MODE*GEAR_RATIO_TILT/360)){
+    if (x_coord < (90*STEPS_PER_REV*STEPPING_MODE*GEAR_RATIO_PAN/360)){
         gpio_put(DIR_X, 0);
-        x_coord -= motorx_on_state;
+        x_coord += motorx_on_state;
     } else {
         gpio_put(DIR_X, 1);
         x_coord -= motorx_on_state;
@@ -167,7 +168,6 @@ void get_current_task(void) {
     printf("current motor_y: %d \n",TMC2209_GetCurrent(&driver_Y));
 }
 int main() {
-    gpio_put(DIR_X,1);
     stdio_init_all();
     
     
@@ -271,7 +271,7 @@ int main() {
 
     gpio_set_irq_enabled_with_callback(ENCODER_A,0x4|0x8,1, encoder_callback);
     gpio_set_irq_enabled_with_callback(ENCODER_B,0x4|0x8,1, encoder_callback);
-    sleep_ms(1000);
+    sleep_ms(5000);
     gpio_put(25,1);
   
 
