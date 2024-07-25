@@ -29,16 +29,7 @@
 
 // #define NSLEEP     12
 // #define NRST       13
-#define EN_A     28
-#define EN_B 22
-#define SLEEP_PIN  17 //any GPIO pin
-#define LED_PIN 25
-#define ENCODER_A  12
-#define ENCODER_B  13
-#define MS2A 21
-#define MS2B 20
-#define MS1B 26
-#define MS1A 27
+
 // Define constants for 12-hour cycle
 #define TWELVE_HOURS_IN_SECONDS 43200
 
@@ -156,27 +147,31 @@ void get_current_task(void) {
     printf("current motor_x: %d \n",TMC2209_GetCurrent(&driver_X));
     printf("current motor_y: %d \n",TMC2209_GetCurrent(&driver_Y));
 }
+
 int main() {
     gpio_put(DIR_X,1);
     stdio_init_all();
-    
+    gpio_init(ENABLE_12_V);
+    gpio_set_dir(ENABLE_12_V,GPIO_OUT);
     
     gpio_init(LED_PIN);
     gpio_set_dir(LED_PIN, GPIO_OUT);
 
     gpio_init(GP19);
-    gpio_init(STEP_X);
     gpio_init(STEP_Y);
-    gpio_init(EN_A);
+
     gpio_init(EN_B);
     // gpio_init(NRST);
-    gpio_init(DIR_X);
+
     gpio_init(DIR_Y);
-    gpio_init(MS1A);
-    gpio_init(MS1B);
+    
     gpio_init(MS2A);
     gpio_init(MS2B);
-
+    gpio_init(STEP_X);
+    gpio_init(DIR_X);
+    gpio_init(EN_A);
+    gpio_init(MS1A);
+    gpio_init(MS1B);
     // gpio_init(NSLEEP);
     gpio_init(SLEEP_PIN);
     gpio_init(25);
@@ -234,7 +229,8 @@ int main() {
     // uart_set_fifo_enabled(UART_INSTANCE, 1);
 
 
-
+    //power to motor drivers
+    gpio_put(ENABLE_12_V,1);
      initialize_motors(&motor_x, &motor_y);
 
     // // Get default configuration parameters
@@ -277,6 +273,7 @@ int main() {
     // const uint LED_PIN = PICO_DEFAULT_LED_PIN;
     kernal.tickPeriod = 100;  // in microseconds ----> 10KHz
     kernal_init();
+
 
 
     //task frequency must be less then 10KHz
