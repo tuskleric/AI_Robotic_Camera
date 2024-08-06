@@ -1,2 +1,0 @@
-e89ad5df00e4df3f2c1f5e1f9ede6ed9aaa939c6a1fd4128ff8ea48c1d038c46  tester_0.0.0-SNAPSHOT-e4ea715_arm.deb
-f434068e68671ff7589c86a2098a7ddfb3f1af192999592e5ec60566898cd4e4  tester_0.0.0-SNAPSHOT-e4ea715_linux_armv7.tar.gz

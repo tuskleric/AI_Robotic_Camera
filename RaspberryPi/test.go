@@ -90,6 +90,32 @@ func main() {
 // 	}
 // 	defer conn.Close()
 
+// 	// Add match for the specific signal you want to receive
+// 	if err := conn.AddMatchSignal(); err != nil {
+// 		panic(err)
+// 	}
+
+// 	// Channel to receive signals
+// 	c := make(chan *dbus.Signal, 10)
+// 	conn.Signal(c)
+
+// 	// Listening for signals
+// 	for signal := range c {
+// 		// Print the content of the signal
+// 		if signal.Path != "/org/freedesktop/DBus" {
+// 			fmt.Printf("Received signal from interface: %s, path: %s\n", signal.Path, signal.Name)
+// 		}
+// 	}
+// }
+
+// func main() {
+// 	conn, err := dbus.ConnectSystemBus()
+// 	if err != nil {
+// 		fmt.Fprintln(os.Stderr, "Failed to connect to session bus:", err)
+// 		os.Exit(1)
+// 	}
+// 	defer conn.Close()
+
 // 	// Initialize periph
 // 	if _, err := host.Init(); err != nil {
 // 		log.Fatal(err)
