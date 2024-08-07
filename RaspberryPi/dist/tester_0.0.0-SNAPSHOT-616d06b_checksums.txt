@@ -1,2 +1,0 @@
-8a8c1cc1811d46beda47de3c6f1fa38c0e58215a30b388ca615fbe17badaa840  tester_0.0.0-SNAPSHOT-616d06b_arm.deb
-acd09e6ed39d86095ddee9a2a2ff6ceabfa187327048f518a2e3ab24f57b8530  tester_0.0.0-SNAPSHOT-616d06b_linux_armv7.tar.gz

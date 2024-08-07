@@ -1,4 +1,4 @@
-project_name: tester
+project_name: robotic_ai_camera
 
 release:
   github:
@@ -7,9 +7,10 @@ release:
   name_template: '{{.Tag}}'
 
 builds:
-- id: test
-  binary: testfoo
-  main: ./test.go
+- id: pico_camera_interface
+  dir: pico_camera_interface
+  binary: pico_camera_interface
+  main: ./pico_camera_interface_main.go
   goos:
     - linux
   goarch:
@@ -17,6 +18,18 @@ builds:
   goarm:
     - "7"
   ldflags: -s -w -X main.version={{.Version}}
+
+# - id: thermal_camera_sim
+#   dir: thermal_camera_sim
+#   binary: thermal_camera_sim
+#   main: ./thermal_camera_sim_main.go
+#   goos:
+#     - linux
+#   goarch:
+#     - arm
+#   goarm:
+#     - "7"
+#   ldflags: -s -w -X main.version={{.Version}}
 
 nfpms:
 - vendor: The Cacophony Project

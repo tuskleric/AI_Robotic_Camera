@@ -1,11 +1,11 @@
-project_name: tester
+project_name: robotic_ai_camera
 release:
   github:
     owner: TheCacophonyProject
     name: tc2-hat-controller
   name_template: '{{.Tag}}'
 builds:
-  - id: test
+  - id: pico_camera_interface
     goos:
       - linux
     goarch:
@@ -18,9 +18,9 @@ builds:
       - v1
     targets:
       - linux_arm_7
-    dir: .
-    main: ./test.go
-    binary: testfoo
+    dir: pico_camera_interface
+    main: ./pico_camera_interface_main.go
+    binary: pico_camera_interface
     builder: go
     gobinary: go
     command: build
@@ -39,7 +39,7 @@ archives:
       - src: CHANGELOG*
 nfpms:
   - file_name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Arch }}'
-    package_name: tester
+    package_name: robotic_ai_camera
     id: default
     formats:
       - deb
