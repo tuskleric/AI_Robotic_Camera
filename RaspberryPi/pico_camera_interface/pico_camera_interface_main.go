@@ -19,15 +19,15 @@ const (
 
 	// Default X
 	AXIS1_PIXEL_WIDTH = 159
-	AXIS1_FOV         = 100
+	AXIS1_FOV         = 57 // From datasheet
 
 	// Default Y
 	AXIS2_PIXEL_WIDTH = 119
-	AXIS2_FOV         = 50
+	AXIS2_FOV         = 57 * AXIS2_PIXEL_WIDTH / AXIS1_PIXEL_WIDTH // Scaled to fit pixel ratios
 
-	INVERT_X    = false
-	INVERT_Y    = false
-	SWITCH_AXES = false
+	INVERT_AXIS1 = false
+	INVERT_AXIS2 = false
+	SWITCH_AXES  = false
 )
 
 func initI2C() *i2c.Dev {
@@ -84,14 +84,14 @@ func convertPixelsToDegree(coords []uint32) (int16, int16) {
 	axis1_angle := (axis1_center*AXIS1_FOV)/AXIS1_PIXEL_WIDTH - AXIS1_FOV/2
 	axis2_angle := (axis2_center*AXIS2_FOV)/AXIS2_PIXEL_WIDTH - AXIS2_FOV/2
 
-	if INVERT_X {
+	if INVERT_AXIS1 {
 		axis1_angle = -axis1_angle
 	}
-	if INVERT_Y {
+	if INVERT_AXIS2 {
 		axis2_angle = -axis2_angle
 	}
 
-	// Multiplied by 10 and converted to 16 bit integer for efficient i2c transmission
+	// Multiplied by 10 for accuracy and converted to 16 bit integer for efficient i2c transmission
 	if SWITCH_AXES {
 		return int16(axis2_angle * 10), int16(axis1_angle * 10)
 	} else {
