@@ -5,7 +5,7 @@ include(pico_sdk_import.cmake)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
-project(pico_fyp C CXX ASM)
+project(AI_ROBOTIC_CAMERA C CXX ASM)
 
 
 pico_sdk_init()
@@ -21,14 +21,22 @@ add_executable(main
   scr/main.c
   scr/stepper_control.c
   scr/PWM.c
+  scr/battery_monitor.c
+  scr/scheduler.c
+  scr/tick.c
+  scr/tmc2209.c
+  scr/common.c
+  scr/blink.c
+
 )
 
 # Link the required libraries
-target_link_libraries(main PRIVATE pico_stdlib hardware_pwm hardware_i2c)
+target_link_libraries(main PRIVATE pico_stdlib pico_time hardware_pwm hardware_adc hardware_uart hardware_i2c )
 
 # Add include directories
 target_include_directories(main PRIVATE ${PICO_SDK_PATH})
 
 
 pico_enable_stdio_usb(main 1)
+
 pico_add_extra_outputs(main)
