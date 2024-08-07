@@ -1,2 +1,0 @@
-111de74e93710a036e056c8d26cfc99bae2c0abe46d20703f6d4d4c96acd9c52  robotic_ai_camera_0.0.0-SNAPSHOT-7d43aaf_arm.deb
-b2d4c83c8e30b7d4f9e56ba5a98c32f570f22c98207726c70b2c0d55c0b96513  robotic_ai_camera_0.0.0-SNAPSHOT-7d43aaf_linux_armv7.tar.gz

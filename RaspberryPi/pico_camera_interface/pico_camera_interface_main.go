@@ -74,7 +74,7 @@ func initDBUS() (*dbus.Conn, chan *dbus.Signal) {
 }
 
 // Function to convert an array of pixel coordinates to degrees
-func convertPixelsToDegree(coords []uint32) (float32, float32) {
+func convertPixelsToDegree(coords []uint32) (int16, int16) {
 
 	// Find center of target
 	axis1_center := float32(coords[0]+coords[2]) / 2
@@ -91,10 +91,11 @@ func convertPixelsToDegree(coords []uint32) (float32, float32) {
 		axis2_angle = -axis2_angle
 	}
 
+	// Multiplied by 10 and converted to 16 bit integer for efficient i2c transmission
 	if SWITCH_AXES {
-		return axis2_angle, axis1_angle
+		return int16(axis2_angle * 10), int16(axis1_angle * 10)
 	} else {
-		return axis1_angle, axis2_angle
+		return int16(axis1_angle * 10), int16(axis2_angle * 10)
 	}
 }
 
@@ -102,7 +103,7 @@ func main() {
 
 	device := initI2C()
 
-	conn, c := initDBUS()
+	_, c := initDBUS()
 
 	// Listening for signals
 	for signal := range c {
@@ -110,23 +111,35 @@ func main() {
 		what := signal.Body[0].(string)
 		confidence := signal.Body[1].(int32)
 		coords := signal.Body[2].([]uint32)
-		tracking := signal.Body[3].(string)
+		tracking := signal.Body[3].(bool)
 
 		// Process data
 		x_angle, y_angle := convertPixelsToDegree(coords)
 
 		// Print the content of the signal
-		fmt.Printf("What = %s, Confidence = %d, Location = X: %f Y: %f, Tracking = %s\n",
+		fmt.Printf("What = %s, Confidence = %d, Location = X: %d Y: %d, Tracking = %t\n",
 			what, confidence, x_angle, y_angle, tracking)
 
-		writeData := []byte{0x01, byte(signal.Body[0].(int32))}
+		// Convert angles to bytes
+		// Assuming the angles are within the range of int16
+		x_angle_bytes := []byte{
+			byte(x_angle >> 8),   // High byte of x_angle
+			byte(x_angle & 0xFF), // Low byte of x_angle
+		}
+		y_angle_bytes := []byte{
+			byte(y_angle >> 8),   // High byte of y_angle
+			byte(y_angle & 0xFF), // Low byte of y_angle
+		}
 
-		fmt.Println("Sending bytes:", writeData)
+		// Combine bytes for x and y angles
+		write_data := append([]byte{0x01}, x_angle_bytes...)
+		write_data = append(write_data, y_angle_bytes...)
 
 		// Write data to the I2C device
-		_, err := device.Write(writeData)
+		_, err := device.Write(write_data)
 		if err != nil {
 			log.Println("Failed to write to device:", err)
 		}
+		fmt.Println("Sending bytes:", write_data)
 	}
 }
