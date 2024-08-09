@@ -24,7 +24,8 @@
 #define DEFAULT_MOTOR_RPM 1
 #define STEPS_PER_REV 200
 #define STEPPING_MODE 32
-#define GEAR_RATIO_PAN 100/18
+#define BIG_GEAR_PAN 100
+#define LITTLE_GEAR_PAN 18
 #define GEAR_RATIO_TILT 30
 #define GP19 19
 
@@ -46,6 +47,11 @@
 
 #define UART_INSTANCE  uart0
 #define UART_PARITY_NONE 0
+
+#define CALCULATE_Y_STEPS(y_angle) \
+    ((y_angle) * (STEPS_PER_REV) * (STEPPING_MODE) * (GEAR_RATIO_TILT) / 360)
+#define CALCULATE_X_STEPS(x_angle) \
+    ((x_angle) * (STEPS_PER_REV) * (STEPPING_MODE) * (BIG_GEAR_PAN) / (LITTLE_GEAR_PAN) / 360)
 
 volatile bool led_state = false;
 volatile bool step_active = false;
@@ -93,12 +99,12 @@ void sleep_for(uint32_t duration_seconds) {
 //     // sleep_goto_dormant_until_edge_high(17);
 // }
 
-int8_t tester[2] = {0, 0};
+int8_t i2c_output[4] = {0, 0, 0, 0};
 
 void I2CIRQHandler() {
 
     uint32_t intr_stat = i2c1->hw->intr_stat;
-    i2c_read_blocking (i2c1, 0x15, &tester, 2, true);
+    i2c_read_blocking (i2c1, 0x15, &i2c_output, 4, true);
 
 }
 
@@ -133,7 +139,8 @@ trinamic_motor_t motor_y;
 
 int32_t x_coord = 0;
 int32_t y_coord = 0;
-int32_t target_x_angle = 0;
+int32_t target_x = 0;
+int32_t target_y = 0;
 
 char buffer[100];
 int buffer_index = 0;
@@ -141,18 +148,37 @@ int buffer_index = 0;
 void led_toggle_task(void) {
     led_state = !led_state;
     gpio_put(25,led_state);
-    printf("wow %d %d\n", tester[0], tester[1]);
+
+    int16_t x_target = (i2c_output[0] << 8) | i2c_output[1];
+    int16_t y_target = (i2c_output[2] << 8) | i2c_output[3];
+
+    printf("wow %d %d\n", x_target, y_target);
+    printf("target encoders %d %d\n", target_x, target_y);
 
 }
 
 void motor_tilt_step_task(void) {
 
-    if (y_coord < (tester[0]*STEPS_PER_REV*STEPPING_MODE*GEAR_RATIO_TILT/360)){
+    int16_t target = (i2c_output[2] << 8) | i2c_output[3];
+
+    if (target != 0) {
+        i2c_output[2] = 0;
+        i2c_output[3] = 0;
+
+        target_y = y_coord + CALCULATE_Y_STEPS(target)/10;
+        if (target_y > CALCULATE_Y_STEPS(45)) {
+            target_y = CALCULATE_Y_STEPS(45);
+        } else if (target_y < CALCULATE_Y_STEPS(-45)) {
+            target_y = CALCULATE_Y_STEPS(-45);
+        }
+    }
+
+    if (y_coord < target_y){
         gpio_put(DIR_Y, 0);
         y_coord += motory_on_state;
         motory_on_state = !motory_on_state;
         gpio_put(STEP_Y, motory_on_state);
-    } else if (y_coord > (tester[0]*STEPS_PER_REV*STEPPING_MODE*GEAR_RATIO_TILT/360)){
+    } else if (y_coord > target_y){
         gpio_put(DIR_Y, 1);
         y_coord -= motory_on_state;
         motory_on_state = !motory_on_state;
@@ -162,12 +188,21 @@ void motor_tilt_step_task(void) {
 
 void motor_pan_step_task(void) {
 
-    if (x_coord < (tester[1]*STEPS_PER_REV*STEPPING_MODE*GEAR_RATIO_PAN/360)){
+    int16_t target = (i2c_output[0] << 8) | i2c_output[1];
+
+    if (target != 0) {
+        i2c_output[0] = 0;
+        i2c_output[1] = 0;
+
+        target_x = x_coord + CALCULATE_X_STEPS(target)/10;
+    }
+
+    if (x_coord < target_x){
         gpio_put(DIR_X, 0);
         x_coord += motorx_on_state;
         motorx_on_state = !motorx_on_state;
         gpio_put(STEP_X, motorx_on_state);
-    } else if (x_coord > (tester[1]*STEPS_PER_REV*STEPPING_MODE*GEAR_RATIO_PAN/360)){
+    } else if (x_coord > target_x){
         gpio_put(DIR_X, 1);
         x_coord -= motorx_on_state;
         motorx_on_state = !motorx_on_state;
