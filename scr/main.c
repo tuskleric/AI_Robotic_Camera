@@ -42,6 +42,7 @@
 #define MS2B 20
 #define MS1B 26
 #define MS1A 27
+#define ENABLE_12_V 15
 // Define constants for 12-hour cycle
 #define TWELVE_HOURS_IN_SECONDS 43200
 
@@ -99,7 +100,7 @@ void sleep_for(uint32_t duration_seconds) {
 //     // sleep_goto_dormant_until_edge_high(17);
 // }
 
-int8_t i2c_output[4] = {0, 0, 0, 0};
+uint8_t i2c_output[4] = {0, 0, 0, 0};
 
 void I2CIRQHandler() {
 
@@ -152,7 +153,7 @@ void led_toggle_task(void) {
     int16_t x_target = (i2c_output[0] << 8) | i2c_output[1];
     int16_t y_target = (i2c_output[2] << 8) | i2c_output[3];
 
-    printf("wow %d %d\n", x_target, y_target);
+    printf("wow %d %d\n", x_coord, y_coord);
     printf("target encoders %d %d\n", target_x, target_y);
 
 }
@@ -239,6 +240,8 @@ int main() {
     gpio_init(25);
     gpio_init(ENCODER_A);
     gpio_init(ENCODER_B);
+    gpio_init(ENABLE_12_V);
+
     gpio_set_dir(GP19, GPIO_OUT);
     gpio_set_dir(STEP_X, GPIO_OUT);
     gpio_set_dir(STEP_Y, GPIO_OUT);
@@ -256,6 +259,7 @@ int main() {
     gpio_set_dir(25, GPIO_OUT);
     gpio_set_dir(ENCODER_A, GPIO_IN);
     gpio_set_dir(ENCODER_B, GPIO_IN);
+    gpio_set_dir(ENABLE_12_V, GPIO_OUT);
 
   
     gpio_put(LED_PIN, 0);
@@ -271,6 +275,7 @@ int main() {
     gpio_put(MS1B, 0);
     gpio_put(MS2A, 1);
     gpio_put(MS2B, 0);
+    gpio_put(ENABLE_12_V, 1);
     // gpio_put(NSLEEP, 1);
     // gpio_put(NRST, 1);
 
