@@ -14,7 +14,7 @@
 #include "battery_monitor.h"
 #include "tmc2209.h"
 #include "common.h"
-#include "target.h"
+#include "target_v2.h"
 
 
 
@@ -33,8 +33,7 @@
 // Define constants for 12-hour cycle
 #define TWELVE_HOURS_IN_SECONDS 43200
 
-#define UART_INSTANCE  uart0
-#define UART_PARITY_NONE 0
+
 
 volatile bool led_state = false;
 volatile bool step_active = false;
@@ -65,21 +64,6 @@ void sleep_for(uint32_t duration_seconds) {
 }
 
 
-// void sleep_ISR() {
-//     //Interrupt Service Routine for Sleeping.
-//     gpio_put(EN_A, 0);
-
-//     // // Go to sleep until we see a high edge on GPIO 10
-//     // sleep_goto_dormant_until_edge_high(17);
-// }
-
-// void awake_ISR() {
-//     //Interrupt Service Routine for Sleeping.
-//     gpio_put(EN_A, 1);
-
-//     // // Go to sleep until we see a high edge on GPIO 10
-//     // sleep_goto_dormant_until_edge_high(17);
-// }
 
 
 int position = 0;
@@ -200,9 +184,9 @@ int main() {
     
     gpio_put(GP19, 0);
     gpio_put(DIR_X, 1);
-    gpio_put(STEP_X, 1);
-    gpio_put(DIR_Y, 1);
-    gpio_put(STEP_Y, 1);
+    gpio_put(STEP_X, 0);
+    gpio_put(DIR_Y, 0);
+    gpio_put(STEP_Y, 0);
     gpio_put(EN_A, 0);
     gpio_put(EN_B, 0);
     gpio_put(MS1A, 0);
@@ -214,7 +198,7 @@ int main() {
 
        // Initialise UART 0
     // Initialize the UART with a baud rate (e.g., 9600)
-    uart_init(UART_INSTANCE, 115200);
+    uart_init(UART_INSTANCE, 14400);
 
     // Set UART format (8 data bits, 1 stop bit, no parity)
     uart_set_format(UART_INSTANCE, 8, 1, UART_PARITY_NONE);
@@ -231,30 +215,31 @@ int main() {
 
     //power to motor drivers
     gpio_put(ENABLE_12_V,1);
-     initialize_motors(&motor_x, &motor_y);
+    initialize_motors(&motor_x, &motor_y);
 
     // // Get default configuration parameters
-    // const trinamic_cfg_params_t *default_params = TMC2209_GetConfigDefaults();
+    const trinamic_cfg_params_t *default_params = TMC2209_GetConfigDefaults();
 
     // // Initialize the driver instance with default values
-    // TMC2209_SetDefaults(&driver_X);
-    // TMC2209_SetDefaults(&driver_Y);
-    // driver_X.config.motor = motor_x;
-    // driver_Y.config.motor = motor_y;
-    // // Initialize the drivers 
-    // TMC2209_datagram_t test_datagram;
-    // test_datagram.payload.ioin.ms1;
+    TMC2209_SetDefaults(&driver_X);
+    TMC2209_SetDefaults(&driver_Y);
+    driver_X.config.motor = motor_x;
+    driver_Y.config.motor = motor_y;
+    // Initialize the drivers 
+    TMC2209_datagram_t test_datagram;
+    test_datagram.payload.ioin.ms1;
     
     
     
-    // //while(1) {printf("success: dir = %x \n",test_datagram.payload.ioin.dir);}
-    // bool init_success_x = TMC2209_Init(&driver_X);
-    // bool init_success_y = TMC2209_Init(&driver_Y);
-    
+    // while(1) {printf("success: dir = %x \n",test_datagram.payload.ioin.dir);}
+    //bool init_success_x = TMC2209_Init(&driver_X);
+    //bool init_success_y = TMC2209_Init(&driver_Y);
+    //while(1) {printf("test");}
+    // while(1) {printf("current motor_x: %d \n",TMC2209_GetCurrent(&driver_X));}
     // TMC2209_SetMicrosteps(&driver_X, TMC2209_Microsteps_128);
     // TMC2209_SetCurrent (&driver_X, 100, 50);
     // TMC2209_SetCurrent (&driver_Y, 100, 50);
-
+  
     gpio_set_irq_enabled_with_callback(ENCODER_A,0x4|0x8,1, encoder_callback);
     gpio_set_irq_enabled_with_callback(ENCODER_B,0x4|0x8,1, encoder_callback);
     sleep_ms(5000);
@@ -285,8 +270,8 @@ int main() {
     //taskId_t get_current_task_id = register_task(get_current_task,3,1000000);
     while(1) {
          
-        
-       kernal_start();
+    
+       //kernal_start();
        printf("success");
     
         // printf("current: %d\n", TMC2209_GetCurrent (&driver_X));
