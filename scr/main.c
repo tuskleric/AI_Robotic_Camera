@@ -29,10 +29,6 @@
 #define GEAR_RATIO_TILT 30
 #define GP19 19
 
-
-// #define NSLEEP     12
-// #define NRST       13
-
 // Define constants for 12-hour cycle
 #define TWELVE_HOURS_IN_SECONDS 43200
 
@@ -80,7 +76,7 @@ uint8_t i2c_output[4] = {0, 0, 0, 0};
 void I2CIRQHandler() {
 
     uint32_t intr_stat = i2c1->hw->intr_stat;
-    i2c_read_blocking (i2c1, 0x15, &i2c_output, 4, true);
+    i2c_read_blocking (i2c1, 0x15, i2c_output, 4, true);
 
 }
 

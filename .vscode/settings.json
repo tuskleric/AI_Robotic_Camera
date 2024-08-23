@@ -32,6 +32,7 @@
     "stdlib.h": "c",
     "binary_info.h": "c",
     "i2c_fifo.h": "c",
-    "random": "c"
+    "random": "c",
+    "finite_state_machine.h": "c"
   }
 }
