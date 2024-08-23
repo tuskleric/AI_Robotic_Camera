@@ -83,23 +83,6 @@ void sleep_for(uint32_t duration_seconds) {
     sleep_ms(duration_seconds * 1000);
 }
 
-
-// void sleep_ISR() {
-//     //Interrupt Service Routine for Sleeping.
-//     gpio_put(EN_A, 0);
-
-//     // // Go to sleep until we see a high edge on GPIO 10
-//     // sleep_goto_dormant_until_edge_high(17);
-// }
-
-// void awake_ISR() {
-//     //Interrupt Service Routine for Sleeping.
-//     gpio_put(EN_A, 1);
-
-//     // // Go to sleep until we see a high edge on GPIO 10
-//     // sleep_goto_dormant_until_edge_high(17);
-// }
-
 uint8_t i2c_output[4] = {0, 0, 0, 0};
 
 void I2CIRQHandler() {
