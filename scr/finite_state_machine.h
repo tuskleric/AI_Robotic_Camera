@@ -14,5 +14,5 @@ typedef enum {
     TIME_REACHED,
 } Event_t;
 
-
+State_t getState(void);
 void update_state(Event_t event);

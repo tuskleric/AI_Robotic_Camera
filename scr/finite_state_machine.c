@@ -2,6 +2,10 @@
 
 State_t mainState = STATE_DISABLE;
 
+State_t getState(void) {
+    return mainState;
+}
+
 void update_state(Event_t event) {
     switch (mainState) {
         case STATE_DISABLE:
