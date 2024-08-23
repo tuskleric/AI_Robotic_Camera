@@ -172,7 +172,7 @@ bool TMC2209_Init (TMC2209_t *driver)
     
     // Perform a status register read/write to clear status flags.
     // If no or bad response from driver return with error.
-    TMC2209_ReadRegister(driver, (TMC2209_datagram_t *)&driver->ioin);
+    //while(1) {TMC2209_ReadRegister(driver, (TMC2209_datagram_t *)&driver->ioin);}
     
     if(!TMC2209_ReadRegister(driver, (TMC2209_datagram_t *)&driver->gstat))
         return false;

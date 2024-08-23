@@ -126,16 +126,42 @@ TMC_uart_write_datagram_t *tmc_uart_read(trinamic_motor_t driver, TMC_uart_read_
 
     datagram->msg.crc = calculate_crc(datagram->data, sizeof(datagram->data) - 1);
     // Write the datagram over UART
-    //while(1){printf("data %x %x %x %x %x %u\n", datagram->data[0],datagram->data[1],datagram->data[2],datagram->data[3], datagram->data[4] ,sizeof(datagram->data)); gpio_put(25,1);}
-    //while(1){
-    uart_write_blocking(UART_INSTANCE, datagram->data, sizeof(datagram->data));
-    // Calculate the CRC for the datagram
-    // while(1){  
+    //while(1){printf("data %x %x %x %x %u\n", datagram->sync,datagram->slave,datagram->addr,datagram->crc ,sizeof(datagram->data)); gpio_put(25,1);}
+    bool flag = false;
+    while(1){
+    gpio_put(25,1);
+    if (flag) {
+        uart_write_blocking(UART_INSTANCE, write_datagram.data, sizeof(write_datagram.data));
+    }
+    else {
+        uart_write_blocking(UART_INSTANCE, datagram->data, sizeof(datagram->data));
+    }
     if(uart_is_readable(UART_INSTANCE)) { 
+        uart_read_blocking(UART_INSTANCE, write_datagram.data, sizeof(datagram->data)+4);
+        gpio_put(25,0);
+        flag =true;
+        sleep_ms(10);
+ 
+        }
+    
+    //printf("data %x %x %x %x %x %x %x %x %u\n", write_datagram.data[0],write_datagram.data[1],write_datagram.data[2],write_datagram.data[3], write_datagram.data[4],write_datagram.data[5],write_datagram.data[6], write_datagram.data[7],sizeof(write_datagram.data));
+    //sleep_ms(50);
+    //printf("crc: %d\n", datagram->msg.crc);
+    //printf("data %x %x %x %x %x %u\n", datagram->data[0],datagram->data[1],datagram->data[2],datagram->data[3], datagram->data[4] ,sizeof(datagram->data)); gpio_put(25,1);
+    }// Calculate the CRC for the datagram
+    //while(1){  
+    // if(uart_is_readable(UART_INSTANCE)) { 
             
     // Read data from UART into the provided buffer
-        uart_read_blocking(UART_INSTANCE, write_datagram.data, sizeof(datagram->data)+4);sleep_ms(10);}
-        gpio_put(25,1);
+    //uart_read_blocking(UART_INSTANCE, write_datagram.data, sizeof(datagram->data)+4);sleep_ms(10);
+    // while(1) {
+    //     printf("crc TX: %d\n", datagram->msg.crc);
+    //     gpio_put(25,1);
+    //     sleep_ms(50);
+    //     gpio_put(25,0);
+    //     sleep_ms(50);
+    //     printf("crc RX: %d\n", write_datagram.msg.crc);
+    // }
             //while(1) {printf("data %x %x %x %x %x %x %x %x %u\n", write_datagram.data[0],write_datagram.data[1],write_datagram.data[2],write_datagram.data[3], write_datagram.data[4],write_datagram.data[5],write_datagram.data[6], write_datagram.data[7],sizeof(write_datagram.data)); gpio_put(25,1);}
         //while(1) {
             //uart_write_blocking(UART_INSTANCE, write_datagram.data, sizeof(write_datagram.data));sleep_ms(10);

@@ -15,7 +15,7 @@
 #include "battery_monitor.h"
 #include "tmc2209.h"
 #include "common.h"
-#include "target.h"
+#include "target_v2.h"
 
 
 
@@ -32,22 +32,14 @@
 
 // #define NSLEEP     12
 // #define NRST       13
-#define EN_A     28
-#define EN_B 22
-#define SLEEP_PIN  17 //any GPIO pin
-#define LED_PIN 25
-#define ENCODER_A  4
-#define ENCODER_B  5
-#define MS2A 21
-#define MS2B 20
-#define MS1B 26
-#define MS1A 27
-#define ENABLE_12_V 15
+
 // Define constants for 12-hour cycle
 #define TWELVE_HOURS_IN_SECONDS 43200
 
-#define UART_INSTANCE  uart0
-#define UART_PARITY_NONE 0
+#define CALCULATE_Y_STEPS(y_angle) \
+    ((y_angle) * (STEPS_PER_REV) * (STEPPING_MODE) * (GEAR_RATIO_TILT) / 360)
+#define CALCULATE_X_STEPS(x_angle) \
+    ((x_angle) * (STEPS_PER_REV) * (STEPPING_MODE) * (BIG_GEAR_PAN) / (LITTLE_GEAR_PAN) / 360)
 
 #define CALCULATE_Y_STEPS(y_angle) \
     ((y_angle) * (STEPS_PER_REV) * (STEPPING_MODE) * (GEAR_RATIO_TILT) / 360)
@@ -198,26 +190,30 @@ void get_current_task(void) {
     printf("current motor_x: %d \n",TMC2209_GetCurrent(&driver_X));
     printf("current motor_y: %d \n",TMC2209_GetCurrent(&driver_Y));
 }
+
 int main() {
     stdio_init_all();
-    
+    gpio_init(ENABLE_12_V);
+    gpio_set_dir(ENABLE_12_V,GPIO_OUT);
     
     gpio_init(LED_PIN);
     gpio_set_dir(LED_PIN, GPIO_OUT);
 
     gpio_init(GP19);
-    gpio_init(STEP_X);
     gpio_init(STEP_Y);
-    gpio_init(EN_A);
+
     gpio_init(EN_B);
     // gpio_init(NRST);
-    gpio_init(DIR_X);
+
     gpio_init(DIR_Y);
-    gpio_init(MS1A);
-    gpio_init(MS1B);
+    
     gpio_init(MS2A);
     gpio_init(MS2B);
-
+    gpio_init(STEP_X);
+    gpio_init(DIR_X);
+    gpio_init(EN_A);
+    gpio_init(MS1A);
+    gpio_init(MS1B);
     // gpio_init(NSLEEP);
     gpio_init(SLEEP_PIN);
     gpio_init(25);
@@ -249,9 +245,9 @@ int main() {
     
     gpio_put(GP19, 0);
     gpio_put(DIR_X, 1);
-    gpio_put(STEP_X, 1);
-    gpio_put(DIR_Y, 1);
-    gpio_put(STEP_Y, 1);
+    gpio_put(STEP_X, 0);
+    gpio_put(DIR_Y, 0);
+    gpio_put(STEP_Y, 0);
     gpio_put(EN_A, 0);
     gpio_put(EN_B, 0);
     gpio_put(MS1A, 1);
@@ -264,7 +260,7 @@ int main() {
 
        // Initialise UART 0
     // Initialize the UART with a baud rate (e.g., 9600)
-    uart_init(UART_INSTANCE, 115200);
+    uart_init(UART_INSTANCE, 14400);
 
     // Set UART format (8 data bits, 1 stop bit, no parity)
     uart_set_format(UART_INSTANCE, 8, 1, UART_PARITY_NONE);
@@ -301,27 +297,28 @@ int main() {
     initialize_motors(&motor_x, &motor_y);
 
     // // Get default configuration parameters
-    // const trinamic_cfg_params_t *default_params = TMC2209_GetConfigDefaults();
+    const trinamic_cfg_params_t *default_params = TMC2209_GetConfigDefaults();
 
     // // Initialize the driver instance with default values
-    // TMC2209_SetDefaults(&driver_X);
-    // TMC2209_SetDefaults(&driver_Y);
-    // driver_X.config.motor = motor_x;
-    // driver_Y.config.motor = motor_y;
-    // // Initialize the drivers 
-    // TMC2209_datagram_t test_datagram;
-    // test_datagram.payload.ioin.ms1;
+    TMC2209_SetDefaults(&driver_X);
+    TMC2209_SetDefaults(&driver_Y);
+    driver_X.config.motor = motor_x;
+    driver_Y.config.motor = motor_y;
+    // Initialize the drivers 
+    TMC2209_datagram_t test_datagram;
+    test_datagram.payload.ioin.ms1;
     
     
     
-    // //while(1) {printf("success: dir = %x \n",test_datagram.payload.ioin.dir);}
-    // bool init_success_x = TMC2209_Init(&driver_X);
-    // bool init_success_y = TMC2209_Init(&driver_Y);
-    
+    // while(1) {printf("success: dir = %x \n",test_datagram.payload.ioin.dir);}
+    //bool init_success_x = TMC2209_Init(&driver_X);
+    //bool init_success_y = TMC2209_Init(&driver_Y);
+    //while(1) {printf("test");}
+    // while(1) {printf("current motor_x: %d \n",TMC2209_GetCurrent(&driver_X));}
     // TMC2209_SetMicrosteps(&driver_X, TMC2209_Microsteps_128);
     // TMC2209_SetCurrent (&driver_X, 100, 50);
     // TMC2209_SetCurrent (&driver_Y, 100, 50);
-
+  
     gpio_set_irq_enabled_with_callback(ENCODER_A,0x4|0x8,1, encoder_callback);
     gpio_set_irq_enabled_with_callback(ENCODER_B,0x4|0x8,1, encoder_callback);
     sleep_ms(5000);
@@ -340,6 +337,7 @@ int main() {
     // const uint LED_PIN = PICO_DEFAULT_LED_PIN;
     kernal.tickPeriod = 100;  // in microseconds ----> 100KHz
     kernal_init();
+
 
 
     //task frequency must be less then 10KHz
