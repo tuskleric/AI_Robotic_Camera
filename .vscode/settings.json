@@ -33,6 +33,7 @@
     "binary_info.h": "c",
     "i2c_fifo.h": "c",
     "random": "c",
-    "finite_state_machine.h": "c"
+    "finite_state_machine.h": "c",
+    "battery_monitor.h": "c"
   }
 }

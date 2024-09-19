@@ -17,6 +17,9 @@
 #include "common.h"
 #include "target_v2.h"
 
+#define I2C_PORT i2c0
+#define SDA_PIN 0
+#define SCL_PIN 1
 
 
 #define ADC_TEMP_CH 4
@@ -75,9 +78,8 @@ uint8_t i2c_output[4] = {0, 0, 0, 0};
 
 void I2CIRQHandler() {
 
-    uint32_t intr_stat = i2c1->hw->intr_stat;
-    i2c_read_blocking (i2c1, 0x15, i2c_output, 4, true);
-
+    uint32_t intr_stat = I2C_PORT->hw->intr_stat;
+    i2c_read_blocking (I2C_PORT, 0x15, i2c_output, 4, true);
 }
 
 int position = 0;
@@ -143,6 +145,10 @@ void motor_tilt_step_task(void) {
         } else if (target_y < CALCULATE_Y_STEPS(-45)) {
             target_y = CALCULATE_Y_STEPS(-45);
         }
+        gpio_put(EN_B, 0);
+        if (abs(target) < 50) {
+            target_y = y_coord;
+        }
     }
 
     if (y_coord < target_y){
@@ -155,6 +161,8 @@ void motor_tilt_step_task(void) {
         y_coord -= motory_on_state;
         motory_on_state = !motory_on_state;
         gpio_put(STEP_Y, motory_on_state);
+    } else {
+        gpio_put(EN_B, 1);
     }
 }
 
@@ -167,6 +175,10 @@ void motor_pan_step_task(void) {
         i2c_output[1] = 0;
 
         target_x = x_coord + CALCULATE_X_STEPS(target)/10;
+        gpio_put(EN_A, 0);
+        if (abs(target) < 50) {
+            target_x = y_coord;
+        }
     }
 
     if (x_coord < target_x){
@@ -179,6 +191,8 @@ void motor_pan_step_task(void) {
         x_coord -= motorx_on_state;
         motorx_on_state = !motorx_on_state;
         gpio_put(STEP_X, motorx_on_state);
+    } else {
+        gpio_put(EN_A, 1);
     }
 
 }
@@ -270,22 +284,22 @@ int main() {
     
     // uart_set_fifo_enabled(UART_INSTANCE, 1);
 
-    // This example will use I2C0 on the default SDA and SCL pins (GP4, GP5 on a Pico)
-    i2c_init(i2c1, 100 * 1000);
-    i2c_set_slave_mode (i2c1, true, 0x15);
-    gpio_set_function(2, GPIO_FUNC_I2C);
-    gpio_set_function(3, GPIO_FUNC_I2C);
-    gpio_pull_up(2);
-    gpio_pull_up(3);
+    // Set up I2C
+    i2c_init(I2C_PORT, 100 * 1000);
+    i2c_set_slave_mode (I2C_PORT, true, 0x15);
+    gpio_set_function(SDA_PIN, GPIO_FUNC_I2C);
+    gpio_set_function(SCL_PIN, GPIO_FUNC_I2C);
+    gpio_pull_up(SDA_PIN);
+    gpio_pull_up(SCL_PIN);
 
     // Enable the I2C interrupts we want to process
-    i2c1->hw->intr_mask = (I2C_IC_INTR_MASK_M_RD_REQ_BITS | I2C_IC_INTR_MASK_M_RX_FULL_BITS);
+    i2c0->hw->intr_mask = (I2C_IC_INTR_MASK_M_RD_REQ_BITS | I2C_IC_INTR_MASK_M_RX_FULL_BITS);
 
     // Set up the interrupt handler to service I2C interrupts
-    irq_set_exclusive_handler(I2C1_IRQ, I2CIRQHandler);
+    irq_set_exclusive_handler(I2C0_IRQ, I2CIRQHandler);
         
     // Enable I2C interrupt
-    irq_set_enabled(I2C1_IRQ, true);
+    irq_set_enabled(I2C0_IRQ, true);
 
     // Make the I2C pins available to picotool
     //bi_decl(bi_2pins_with_func(2, 3, GPIO_FUNC_I2C));
