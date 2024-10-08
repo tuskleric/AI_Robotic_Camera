@@ -27,7 +27,8 @@ add_executable(main
   scr/tmc2209.c
   scr/common.c
   scr/blink.c
-
+  scr/rangefinder.c
+  scr/imu.c
 )
 
 # Link the required libraries
@@ -35,6 +36,11 @@ target_link_libraries(main PRIVATE pico_stdlib pico_time hardware_pwm hardware_a
 
 # Add include directories
 target_include_directories(main PRIVATE ${PICO_SDK_PATH})
+
+target_compile_definitions(main PRIVATE
+    PICO_DEFAULT_UART_TX_PIN=8
+    PICO_DEFAULT_UART_RX_PIN=9
+)
 
 
 pico_enable_stdio_usb(main 1)

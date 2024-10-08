@@ -16,6 +16,7 @@
 #include "tmc2209.h"
 #include "common.h"
 #include "target_v2.h"
+#include "rangefinder.h"
 
 #define I2C_PORT i2c0
 #define SDA_PIN 0
@@ -270,6 +271,7 @@ int main() {
 
        // Initialise UART 0
     // Initialize the UART with a baud rate (e.g., 9600)
+    rangefinder_init();
     uart_init(UART_INSTANCE, 14400);
 
     // Set UART format (8 data bits, 1 stop bit, no parity)
