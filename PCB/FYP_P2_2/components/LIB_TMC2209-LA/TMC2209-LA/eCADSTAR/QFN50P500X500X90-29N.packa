@@ -1,0 +1,13 @@
+(unit MM)
+
+(package "TMC2209-LA"
+    (type UNDEF)
+    (uver 2)
+    (cuser "SamacSys")
+    (uuser "SamacSys")
+    (utime 2023-10-12-05:02:34)
+    (mountForm default
+        (footprintRef "QFN50P500X500X90-29N")
+        (spec "System")
+    )
+)

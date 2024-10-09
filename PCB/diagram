@@ -1,0 +1,5 @@
+digraph {
+	A [image="FYP_P2_2_3D_floating.png" shape=rect]
+	B [shape=rect]
+	A -> B
+}

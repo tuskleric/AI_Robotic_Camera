@@ -1,0 +1,6 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "TMC2209")(type "KiCad")(uri "C:/Users/jsu109/OneDrive - University of Canterbury/Fourth year/FYP/PCB/components_models/TMC2209/TMC2209.kicad_sym")(options "")(descr ""))
+  (lib (name "PICO")(type "KiCad")(uri "C:/Users/sudda/OneDrive - University of Canterbury/Fourth year/FYP/PCB/components_models/LIB_PICO/PICO/KiCad/PICO.kicad_sym")(options "")(descr ""))
+  (lib (name "power_conn")(type "KiCad")(uri "C:/Users/jsu109/OneDrive - University of Canterbury/Fourth year/FYP/PCB/components_models/molex connector/2024-05-31_03-02-51.kicad_sym")(options "")(descr ""))
+)

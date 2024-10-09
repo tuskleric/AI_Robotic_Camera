@@ -1,0 +1,18 @@
+.TMC2209-LA :1 ;Silent stepper motor driver 5 to 36V, up to 1.4A with S/D and UART Interface, 256 Steps, SpreadCycle and Stealthchop2
+QFN50P500X500X90-29N
+*STM IC
+*NGS
+*PLB 1="OB2" 2="ENN" 3="GND_1" 4="CPO" 5="CPI" 6="VCP" 7="SPREAD" 8="5VOUT" 9="MS1_AD0" 10="MS2_AD1" 11="DIAG" 12="INDEX" 13="CLK" 14="PDN_UART" 15="VCC_IO" 16="STEP" 17="VREF" 18="GND_2" 19="DIR" 20="STDBY" 21="OA2" 22="VS_1" 23="BRA" 24="OA1" 25="-" 26="OB1" 27="BRB" 28="VS_2" 29="EP"
+*MXP 29
+*DFN TMC2209-LA
+~!Manufacturer_Name (Analog Devices)
+~!Manufacturer_Part_Number (TMC2209-LA)
+~!Mouser Part Number (700-TMC2209-LA)
+~!Link Mouser Price/Stock (https://www.mouser.co.uk/ProductDetail/ADI-Trinamic/TMC2209-LA?qs=TiOZkKH1s2QqRRreEQH08w%3D%3D)
+~!Arrow Part Number (TMC2209-LA)
+~!Link Arrow Price/Stock (null?region=asia)
+~!Link Datasheet (https://www.analog.com/media/en/technical-documentation/data-sheets/TMC2209_datasheet_rev1.09.pdf)
+~!Height (0.9mm)
+~!3D_Model (TMC2209-LA)
+TMC2209-LA
+1.1!U 2.1!U 3.1!U 4.1!U 5.1!U 6.1!U 7.1!U 8.1!U 9.1!U 10.1!U 11.1!U 12.1!U 13.1!U 14.1!U 21.1!U 20.1!U 19.1!U 18.1!U 17.1!U 16.1!U 15.1!U 29.1!U 28.1!U 27.1!U 26.1!U 25.1!U 24.1!U 23.1!U 22.1!U 

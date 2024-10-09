@@ -1,0 +1,11 @@
+FILE_TYPE = MULTI_PHYS_TABLE;
+
+PART 'TMC2209_LA'
+CLASS = IC
+{========================================================================================}
+:"MANUFACTURER_NAME", "MANUFACTURER_PART_NUMBER"= "PART_NUMBER", "JEDEC_TYPE", "PACK_TYPE", "MOUSER_PART_NUMBER", "MOUSER_PRICE/STOCK", "ARROW_PART_NUMBER", "ARROW_PRICE/STOCK", "DESCRIPTION", "DATASHEET", "HEIGHT";
+{========================================================================================}
+ "Analog Devices", "TMC2209-LA" (!) = "", "QFN50P500X500X90-29N", "Quad Flat No-Lead", "700-TMC2209-LA", "https://www.mouser.co.uk/ProductDetail/ADI-Trinamic/TMC2209-LA?qs=TiOZkKH1s2QqRRreEQH08w%3D%3D", "TMC2209-LA", "null?region=asia", "Silent stepper motor driver 5 to 36V, up to 1.4A with S/D and UART Interface, 256 Steps, SpreadCycle and Stealthchop2", "https://www.analog.com/media/en/technical-documentation/data-sheets/TMC2209_datasheet_rev1.09.pdf", "0.9 mm"
+END_PART
+
+END.
